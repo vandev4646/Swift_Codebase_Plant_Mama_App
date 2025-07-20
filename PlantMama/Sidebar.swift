@@ -15,7 +15,11 @@ struct Sidebar: View {
         ZStack{
             PinkCardBackground()
             VStack{
-                Image(systemName: "camera")
+                NavigationLink{
+                    CameraView()
+                } label: {
+                    Image(systemName: "camera").foregroundColor(.black)
+                }
                 Spacer()
                 Button(action: {
                     addingReminder.toggle()
