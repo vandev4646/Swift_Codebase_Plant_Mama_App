@@ -12,16 +12,26 @@ struct PhotoCardView: View {
     let photo: Photo
     
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+       // ZStack(alignment: .topTrailing) {
             AsyncImage(url: photo.url) { image in
                 image
                     .resizable()
                     .scaledToFill()
             } placeholder: {
-                ProgressView()
+                ZStack{
+                    let url = Bundle.main.url(forResource: "Default", withExtension: "png")
+                    AsyncImage(url: url){
+                        image in image
+                            .image?.resizable()
+                            .scaledToFill()
+                    }
+                    ProgressView()
+                }
+                
             }
             .frame(width: size, height: size)
-        }
+            //Text(photo.url.absoluteString)
+      //  }
     }
 }
 

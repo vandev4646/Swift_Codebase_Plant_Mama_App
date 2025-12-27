@@ -16,7 +16,10 @@ struct PhotoRow: View {
             LazyVGrid(columns: gridColumns) {
                 ForEach (plant.photos){
                     photo in GeometryReader{
-                        geo in PhotoCardView(size: geo.size.width, photo: photo)
+                        geo in
+                        NavigationLink(destination: PhotoDetail(plant: plant, photo: photo)){
+                            PhotoCardView(size: geo.size.width, photo: photo)
+                        }
                     }
                     .cornerRadius(8.0)
                     .aspectRatio(1, contentMode: .fit)

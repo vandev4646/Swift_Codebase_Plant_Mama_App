@@ -14,7 +14,8 @@ struct DetailEditView: View {
     @State private var name: String
     @State private var datePurchased: Date
     @State private var type: String
-    @State private var notes: String
+    @State private var details: String
+    @State private var profilePic: Photo
     @State private var errorWrapper: ErrorWrapper?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
@@ -28,7 +29,8 @@ struct DetailEditView: View {
             plantToEdit = plant
             isCreatingPlant = false
         } else {
-            plantToEdit = Plant(name: "", profilePic: "Default", type: "", notes: "", reminders: [], photos: [])
+            plantToEdit = Plant(name: "", profilePic: Photo(url: Bundle.main.url(forResource: "Default", withExtension: "png")!), type: "", details: "", reminders: [], photos: [],
+                noteList: [])
             isCreatingPlant = true
         }
         
@@ -36,8 +38,9 @@ struct DetailEditView: View {
         self.name = plantToEdit.name
         self.datePurchased = plantToEdit.datePurChased
         self.type = plantToEdit.type
-        self.notes = plantToEdit.notes
+        self.details = plantToEdit.details
         self.size = size
+        self.profilePic = plantToEdit.profilePic
         
     }
     
@@ -47,23 +50,27 @@ struct DetailEditView: View {
             CardBackground()
             
                 VStack{
-                   
                     
-                        DetailsEditsRow(label: "Name", value: $name).padding()
-                        HStack{
-                            Text("Date Purchased")
-                            DatePicker("Date Purchased", selection: $datePurchased)
-                                .labelsHidden()
-                                .listRowSeparator(.hidden)
-                            
+                    SetProfilePic(plant: plant, profilePic: $profilePic, size: 120.0).padding()
+                    
+                    DetailsEditsRow(label: "Name", value: $name).padding(10)
+                    
+                    
+                    HStack{
+                        Text("Date Purchased").padding(.leading, 10)
+                                Spacer()
+                                DatePicker("Date Purchased", selection: $datePurchased, displayedComponents: [.date])
+                                    .labelsHidden()
+                                    .listRowSeparator(.hidden)
+                                
                         }
-                        DetailsEditsRow(label: "Type", value: $type).padding()
-                        DetailsEditsRow(label: "Notes", value: $notes).padding()
+                    DetailsEditsRow(label: "Type", value: $type).padding(10)
+                       
+                    DetailsEditsRow(label: "Details", value: $details).padding(10)
                             
-                    
-                    
                 }
                 .padding()
+                //.frame(maxWidth: .infinity)
             
         }.frame( height: size)
             .toolbar {
@@ -82,7 +89,7 @@ struct DetailEditView: View {
                         } catch {
                             errorWrapper = ErrorWrapper(error: error, guidance: "New Plant was not created. Try again later.")
                         }
-                    }
+                    }.disabled(name.isEmpty)
                 }
             }
             .sheet(item: $errorWrapper) {
@@ -94,11 +101,13 @@ struct DetailEditView: View {
     
     private func saveEdits() throws {
         plant.name = name
-        plant.notes = notes
+        plant.details = details
         plant.type = type
         plant.datePurChased = datePurchased
+        plant.profilePic = profilePic
 
         if isCreatingPlant {
+            plant.photos.append(profilePic)
             context.insert(plant)
         }
 
@@ -114,15 +123,18 @@ struct DetailsEditsRow: View {
     
     var body: some View {
         HStack {
-            Text(label)
+            Text(label).frame(width: .infinity).padding(.trailing)
             Spacer()
             TextField(label, text: $value)
+                .bold().frame( alignment: .trailing)
         }
     }
 }
 
 
+
+
 #Preview(traits: .plantSampleData) {
     @Previewable @Query(sort: \Plant.name) var plants: [Plant]
-    DetailEditView(plant: plants[0], size: 200)
+    DetailEditView(plant: plants[0], size: 700)
 }

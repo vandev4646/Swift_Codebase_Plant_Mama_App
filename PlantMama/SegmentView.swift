@@ -9,6 +9,7 @@ import SwiftUI
 
 enum SegmentSelection: String, CaseIterable {
     case photos = "Photos"
+    case notes = "Notes"
     case reminders = "Reminders"
 }
 
@@ -51,8 +52,11 @@ struct SegmentView: View {
             if selection == .photos {
                 PhotoRow(plant: plant)
             }
-            else {
+            else if(selection == .reminders) {
                 ReminderRow(plant: $plant)
+            }
+            else {
+                NoteRow(plant: $plant)
             }
         }
     }

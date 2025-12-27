@@ -11,6 +11,7 @@ struct PlantDetail: View {
     @Binding var plant: Plant
     @Binding var isEditing: Bool
     @State var addingReminder: Bool
+    @State var addingNote: Bool
     
     var body: some View {
         if !isEditing{
@@ -18,16 +19,21 @@ struct PlantDetail: View {
                 geometry in
                 
                 VStack{
-                    TitleView(plant: plant)
+                    TitleView(plant: plant, size: geometry.size.width)
                     HStack{
                         DetailsView(plant: plant, size: ((geometry.size.height)*(2/5)))
-                        Sidebar(size:((geometry.size.height)*(1/3)), addingReminder: $addingReminder, isEditing: $isEditing)
+                        Sidebar(size:((geometry.size.height)*(1/3)), plant: $plant, addingReminder: $addingReminder, isEditing: $isEditing, addingNote: $addingNote)
                     }
                     SegmentView(plant: $plant)
                 }
                 .sheet(isPresented: $addingReminder) {
                     NavigationView {
                         AddReminder(plant: plant, addingReminder: $addingReminder)
+                    }
+                }
+                .sheet(isPresented: $addingNote) {
+                    NavigationView {
+                        AddNote(plant: plant, addingNote: $addingNote)
                     }
                 }
                 .background(
@@ -39,7 +45,10 @@ struct PlantDetail: View {
             
         }
         else{
-            DetailEditView(plant: plant, size: 300)
+            GeometryReader{
+                geometry in
+                DetailEditView(plant: plant, size: geometry.size.height*(0.7))
+            }
         }
     }
 }

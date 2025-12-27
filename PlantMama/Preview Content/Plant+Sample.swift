@@ -11,45 +11,47 @@ extension Plant {
     static let sampleData: [Plant] =
     [
         Plant(name: "Sophie",
-              profilePic: "Default",
+              profilePic:  Photo(url: Bundle.main.url(forResource: "Default", withExtension: "png")!),
              type: "Fiddle Leaf Fig",
-             notes: "One of the first plants I ever bought!",
+             details: "One of the first plants I ever bought!",
              reminders: [
-                Reminder(title: "Pot me!", date: Date()),
-                Reminder(title: "Water me!", date: Date())
+                Reminder(title: "Pot me!", detail: "Reminder Detail", date: Date()),
+                Reminder(title: "Water me!", detail: "Reminder Detail", date: Date())
              ],
               photos: [
                 Photo(url: Bundle.main.url(forResource: "Peony", withExtension: "jpeg")!),
                 Photo(url: Bundle.main.url(forResource: "WhiteRose", withExtension: "jpeg")!),
-              ]),
+              ],
+              noteList:[]),
         Plant(name: "Zoe",
-              profilePic: "Peony",
+              profilePic: Photo(url: Bundle.main.url(forResource: "Peony", withExtension: "jpeg")!),
               type: "Fiddle Leaf Fig",
-              notes: "Matthew purchased for me",
+              details: "Matthew purchased for me",
               reminders: [
-                 Reminder(title: "Pot me!", date: Date()),
-                 Reminder(title: "Water me!", date: Date())
+                 Reminder(title: "Pot me!", detail: "Reminder Detail", date: Date()),
+                 Reminder(title: "Water me!", detail: "Reminder Detail", date: Date())
               ]
               ,
               photos: [
                 Photo(url: Bundle.main.url(forResource: "WhiteRose", withExtension: "jpeg")!),
                 Photo(url: Bundle.main.url(forResource: "Default", withExtension: "png")!)
-              ]),
+              ], noteList:[]),
         Plant(name: "Aloe",
-              profilePic: "WhiteRose",
+              profilePic: Photo(url: Bundle.main.url(forResource: "WhiteRose", withExtension: "jpeg")!),
               type: "Aloe Vera",
-              notes: "A gift from Donna",
+              details: "A gift from Donna",
               reminders: [
-                 Reminder(title: "Trim leaves", date: Date()),
-                 Reminder(title: "Pot me!", date: Date()),
-                 Reminder(title: "Water me!", date: Date())
+                 Reminder(title: "Trim leaves", detail: "Reminder Detail", date: Date()),
+                 Reminder(title: "Pot me!", detail: "Reminder Detail",  date: Date()),
+                 Reminder(title: "Water me!", detail: "Reminder Detail", date: Date())
               ],
               photos: [
                 Photo(url: Bundle.main.url(forResource: "Default", withExtension: "png")!),
                 Photo(url: Bundle.main.url(forResource: "Peony", withExtension: "jpeg")!),
                 Photo(url: Bundle.main.url(forResource: "WhiteRose", withExtension: "jpeg")!),
                 Photo(url: Bundle.main.url(forResource: "Default", withExtension: "png")!)
-              ]
+              ], noteList:[]
              )
     ]
 }
+

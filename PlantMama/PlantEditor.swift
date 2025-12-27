@@ -29,39 +29,11 @@ struct PlantEditor: View {
     
     
     var body: some View {
-        VStack{
-            PlantDetail(plant: $plant, isEditing: isNew ? $isNew : $isEditing, addingReminder:false)
-                .toolbar {
-                /*
-                    ToolbarItem(placement: .cancellationAction) {
-                        if isNew {
-                            Button("Cancel") {
-                                dismiss()
-                            }
-                        }
-                    }
-  
-                    ToolbarItem {
-                        Button {
-                            if isNew {
-                                //plantData.plants.append(plantCopy)
-                                dismiss()
-                            } else {
-                                if isEditing && !isDeleted {
-                                    print("Done, saving any changes to \(plant.name).")
-                                    withAnimation {
-                                        //plant = plantCopy // Put edits (if any) back in the store.
-                                    }
-                                }
-                                isEditing.toggle()
-                            }
-                        } label: {
-                            Text(isNew ? "Add" : (isEditing ? "Done" : "Edit"))
-                        }
-                    }
-   */
-                
+        VStack(){
+            if isEditing {
+                Spacer()
             }
+            PlantDetail(plant: $plant, isEditing: isNew ? $isNew : $isEditing, addingReminder:false, addingNote: false)
                 
                 .onAppear {
                     plantCopy = plant // Grab a copy in case we decide to make edits.
@@ -79,11 +51,10 @@ struct PlantEditor: View {
                         .font(.title2)
                         .foregroundColor(.red)
                 })
-                    .padding()
+                    .padding(50)
             }
             
-        }
-        .overlay(alignment: .center) {
+        }.overlay(alignment: .center) {
             if isDeleted {
                 Color(UIColor.systemBackground)
                 Text("Event Deleted. Select an Event.")

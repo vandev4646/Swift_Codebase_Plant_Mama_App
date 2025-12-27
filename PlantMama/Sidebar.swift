@@ -9,29 +9,40 @@ import SwiftUI
 
 struct Sidebar: View {
     let size: Double
+    @Binding var plant : Plant
     @Binding var addingReminder: Bool
     @Binding var isEditing: Bool
+    @Binding var addingNote: Bool
+   
     var body: some View {
         ZStack{
             PinkCardBackground()
             VStack{
                 NavigationLink{
-                    CameraView()
+                    //PhotoPicker(plant:$plant)
+                    CameraView(plant: $plant, updatingProfile: false, profilePic: $plant.profilePic)
+                        
                 } label: {
-                    Image(systemName: "camera").foregroundColor(.black)
+                    Image(systemName: "camera")
+                        .fontWeight(.bold)
+                        .foregroundColor(.dotBrown)
                 }
                 Spacer()
                 Button(action: {
                     addingReminder.toggle()
                 }, label: {
                     Image(systemName: "timer")
-                }).foregroundColor(.black)
+                }).fontWeight(.bold)
+                    .foregroundColor(.dotBrown)
                 Spacer()
                 Button(action: {
                     isEditing.toggle()
                 }, label: {
                     Image(systemName: "pencil")
-                }).foregroundColor(.black)
+                }).fontWeight(.bold)
+                    .foregroundColor(.dotBrown)
+                Spacer()
+                Button(action: {addingNote.toggle()}, label: {Image(systemName: "note.text.badge.plus")}).fontWeight(.bold).foregroundColor(.dotBrown)
             }.padding(.top)
                 .padding(.bottom)
         }.frame(height: size)

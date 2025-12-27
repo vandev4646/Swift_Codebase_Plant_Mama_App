@@ -10,26 +10,37 @@ import SwiftUI
 struct DisplayCard: View {
     var imageModel: ImageModel? //need to use this eventually
     let plant: Plant
-    
+    let size: Double
     var isEditing: Bool = false
     
   
     
     var body: some View {
-        let imageName = ImageModel(fileName: plant.profilePic,location: .resources)
+        //let imageName = ImageModel(fileName: plant.profilePic,location: .resources)
         
         ZStack(alignment: .bottom) {
-            if !isEditing, let url = imageName.url {
-                AsyncImage(url: url) { image in
+            if !isEditing {
+                AsyncImage(url: plant.profilePic.url) { image in
                     image
                         .resizable()
                         .scaledToFill()
-                        .frame(minWidth: 20, maxWidth: .infinity, minHeight: 100, maxHeight: .infinity)
+                    //.clipped()
+                        
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                 } placeholder: {
-                    Text("Loading Image...")
-                        .modifier(FontStyle(size: 12))
-                }
+                    ZStack{
+                        let url = Bundle.main.url(forResource: "Default", withExtension: "png")
+                        AsyncImage(url: url) {
+                            image in image
+                                .image?.resizable()
+                                .scaledToFill()
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                        }
+                        Text("Loading Image...")
+                            .modifier(FontStyle(size: 12))
+                    }
+
+                }.frame(minWidth: size, maxWidth: size , minHeight: size, maxHeight: size)
                 
             }
             
@@ -39,13 +50,19 @@ struct DisplayCard: View {
                     .aspectRatio(5, contentMode: ContentMode.fit)
                     .foregroundColor(.white)
                     .opacity(0.9)
+                    .frame(maxWidth: size * 7/8)
                 
                 Text(plant.name)
                     .font(.title)
                     .fontWeight(.semibold)
+                    .foregroundColor(.dotBrown)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+                    .padding(.leading, 5)
+                    .padding(.trailing, 5)
                 
             }.padding()
-        }
+        }.frame(minWidth: size, maxWidth: size , minHeight: size, maxHeight: size)
     }
 }
 
@@ -69,7 +86,7 @@ struct ImageModel: Codable {
                 return nil
             }
             let documentDirectory = FileManager.default.documentDirectory
-            return documentDirectory.appendingPathComponent(fileName)
+            return documentDirectory?.appendingPathComponent(fileName)
         }
         
     }
@@ -77,5 +94,5 @@ struct ImageModel: Codable {
 
 #Preview {
     let plant = Plant.sampleData[0]
-    DisplayCard(plant: plant)
+    DisplayCard(plant: plant, size: 200)
 }

@@ -18,58 +18,36 @@ struct ReminderRow: View {
                     VStack{
                         HStack {
                             Text(reminder.title)
+                                .foregroundColor(.dotBrown)
+                                .fontWeight(.semibold)
                             Spacer()
                             Button(action: {
                                 //context.delete(reminder)
+                                cancelNotification(identifer: reminder.id.uuidString)
                                 plant.reminders.removeAll(where: { $0.id == reminder.id })
                             }, label: {Label("", systemImage: "trash")})
                         }.padding()
                         
                         HStack {
                             Text(reminder.date, style: .date)
+                                .foregroundColor(.dotBrown)
+                                .fontWeight(.semibold)
                             Spacer()
                             Text(reminder.date, style: .time)
+                                .foregroundColor(.dotBrown)
+                                .fontWeight(.semibold)
                         }
                         
                     }.padding()
                 }
                 
-                
-               // ReminderRowDetails(reminder: $reminder)
-               //     .padding()
-                
             }
             
+        }.onAppear{
+            cleanupExpiredReminders(plant: plant)
         }
     }
         
 }
 
 
-
-
-struct ReminderRowDetails: View {
-    @Environment(\.modelContext) private var context
-    @Binding var reminder: Reminder
-    var body: some View {
-        ZStack{
-            CardBackground()
-            VStack{
-                HStack {
-                    Text(reminder.title)
-                    Spacer()
-                    Button(action: {
-                        context.delete(reminder)
-                    }, label: {Label("", systemImage: "trash")})
-                }.padding()
-                
-                HStack {
-                    Text(reminder.date, style: .date)
-                    Spacer()
-                    Text(reminder.date, style: .time)
-                }
-                
-            }.padding()
-        }
-    }
-}

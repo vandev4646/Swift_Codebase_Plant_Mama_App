@@ -7,8 +7,11 @@ import SwiftUI
 
 struct CameraView: View {
     @StateObject private var model = DataModel()
- 
+    @Binding var plant: Plant
     private static let barHeightFactor = 0.15
+    @Environment(\.dismiss) var dismiss
+    var updatingProfile: Bool
+    @Binding var profilePic: Photo
     
     
     var body: some View {
@@ -42,25 +45,28 @@ struct CameraView: View {
             }
             .navigationTitle("Camera")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarHidden(true)
+            //.navigationBarHidden(true)
             .ignoresSafeArea()
             .statusBar(hidden: true)
         }
     }
     
     private func buttonsView() -> some View {
-        HStack(spacing: 60) {
+            HStack(spacing: 60) {
             
             Spacer()
-            
+
             NavigationLink {
-                PhotoCollectionView(photoCollection: model.photoCollection)
+                PhotoPicker(plant:$plant, updatingProfile: updatingProfile, profilePic: $profilePic)
+                //PhotoCollectionView(photoCollection: model.photoCollection)
                     .onAppear {
                         model.camera.isPreviewPaused = true
                     }
                     .onDisappear {
-                        model.camera.isPreviewPaused = false
+                        dismiss()
+                       // model.camera.isPreviewPaused = false
                     }
+                
             } label: {
                 Label {
                     Text("Gallery")
@@ -69,8 +75,14 @@ struct CameraView: View {
                 }
             }
             
-            Button {
-                model.camera.takePhoto()
+                NavigationLink {
+                    PhotoPicker(plant:$plant, updatingProfile: updatingProfile, profilePic: $profilePic)
+                        .onAppear {
+                            model.camera.takePhoto()
+                        }
+                        .onDisappear {
+                            dismiss()
+                        }
             } label: {
                 Label {
                     Text("Take Photo")

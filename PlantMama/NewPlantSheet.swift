@@ -14,7 +14,7 @@ struct NewPlantSheet: View {
             geometry in
             
             NavigationStack {
-                DetailEditView(plant: nil, size: ((geometry.size.height)*(2/5)))
+                DetailEditView(plant: nil, size: ((geometry.size.height)*(0.7)))
             }
             
         }
