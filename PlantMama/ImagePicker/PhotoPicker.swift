@@ -10,7 +10,20 @@ struct PhotoPicker: UIViewControllerRepresentable {
     @Binding var plant: Plant
     var updatingProfile: Bool
     @Binding var profilePic: Photo
+    @Binding var addingNote: Note?
    // @EnvironmentObject var dataModel: DataModel
+    
+    init(
+            plant: Binding<Plant>,
+            updatingProfile: Bool,
+            profilePic: Binding<Photo>,
+            addingNote: Binding<Note?> = .constant(nil) // Default value here
+        ) {
+            self._plant = plant
+            self.updatingProfile = updatingProfile
+            self._profilePic = profilePic
+            self._addingNote = addingNote
+        }
     
     /// A dismiss action provided by the environment. This may be called to dismiss this view controller.
     @Environment(\.dismiss) var dismiss
@@ -42,8 +55,55 @@ struct PhotoPicker: UIViewControllerRepresentable {
 }
 
 class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
-    let parent: PhotoPicker
+    var parent: PhotoPicker
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        self.parent.dismiss()
+        
+        guard let result = results.first,
+              result.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) else { return }
+        
+        result.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { url, error in
+            if let url = url {
+                // 1. Generate a unique name for the file
+                let newFileName = "photo_\(UUID().uuidString).jpg"
+                
+                // 2. Get the current Documents directory
+                let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                let destinationURL = documentsURL.appendingPathComponent(newFileName)
+                
+                do {
+                    // 3. Copy the file to the new location
+                    try FileManager.default.copyItem(at: url, to: destinationURL)
+                    
+                    // 4. Save ONLY the filename to SwiftData
+                    Task { @MainActor in
+                        withAnimation {
+                            let newPhoto = Photo(fileName: newFileName)
+                            self.parent.plant.photos.append(newPhoto)
+                            
+                            if self.parent.updatingProfile {
+                                self.parent.plant.profilePic = newPhoto
+                                self.parent.profilePic = newPhoto
+                            }
+                            if let currentNote = self.parent.addingNote {
+                                        // Check if the photos array itself is nil
+                                        if currentNote.photos == nil {
+                                            currentNote.photos = [newPhoto] // Initialize with the first photo
+                                        } else {
+                                            currentNote.photos?.append(newPhoto) // Append if already exists
+                                        }
+                            }
+                        }
+                    }
+                } catch {
+                    print("Failed to save image: \(error)")
+                }
+            }
+        }
+    }
+
     
+    /*
     /// Called when one or more items have been picked, or when the picker has been canceled.
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         
@@ -87,8 +147,13 @@ class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControl
                     
                 }
             }
+     
         }
+        
+        //////
+     
     }
+     */
     
     init(_ parent: PhotoPicker) {
         self.parent = parent

@@ -38,7 +38,7 @@ struct PhotoCardView: View {
 struct PhotoCardView_Previews: PreviewProvider {
     static var previews: some View {
         if let url = Bundle.main.url(forResource: "Default", withExtension: "png") {
-            PhotoCardView (size: 50, photo: Photo( url: url))
+            PhotoCardView (size: 50, photo: Photo( fileName:"Bundle://Default"))
         }
     }
 }

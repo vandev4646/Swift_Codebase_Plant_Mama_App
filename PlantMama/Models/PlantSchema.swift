@@ -20,4 +20,11 @@ enum PlantSchemaV2: VersionedSchema{
         }
 }
 
+enum PlantSchemaV3: VersionedSchema{
+    static var versionIdentifier = Schema.Version(3, 0, 0)
+        static var models: [any PersistentModel.Type] {
+            [Photo.self, Plant.self, Reminder.self, Note.self]
+        }
+}
+
 

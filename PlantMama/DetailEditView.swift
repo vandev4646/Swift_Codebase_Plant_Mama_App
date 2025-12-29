@@ -29,7 +29,7 @@ struct DetailEditView: View {
             plantToEdit = plant
             isCreatingPlant = false
         } else {
-            plantToEdit = Plant(name: "", profilePic: Photo(url: Bundle.main.url(forResource: "Default", withExtension: "png")!), type: "", details: "", reminders: [], photos: [],
+            plantToEdit = Plant(name: "", profilePic: Photo(fileName: "bundle://Default"), type: "", details: "", reminders: [], photos: [],
                 noteList: [])
             isCreatingPlant = true
         }

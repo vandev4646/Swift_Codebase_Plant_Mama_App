@@ -11,6 +11,7 @@ struct PhotoDetail: View {
     @State var photo: Photo
     @Environment(\.dismiss) var dismiss
     private let imageSize = CGSize(width: 1024, height: 1024)
+    @State private var showNotes = false
     
     var body: some View {
         Group {
@@ -25,7 +26,6 @@ struct PhotoDetail: View {
                         image in image
                             .image?.resizable()
                             .scaledToFit()
-                            
                     }
                     ProgressView()
                 }
@@ -40,6 +40,33 @@ struct PhotoDetail: View {
         .overlay(alignment: .bottom) {
             buttonsView()
                 .offset(x: 0, y: -50)
+        }
+        .sheet(isPresented: $showNotes){
+            noteSheet
+        }
+    }
+    
+    private var noteSheet: some View {
+        NavigationStack{
+            List{
+                if let notes = photo.notes, !notes.isEmpty {
+                    ForEach(notes) { note in
+                        VStack(alignment: .leading,){
+                            Text(note.title)
+                                .font(.headline)
+                        }
+                    }.padding(.vertical, 4)
+                }
+                else{
+                    ContentUnavailableView("No Notes", systemImage: "note.text", description: Text("Go to the notes section to add a note for this photo."))
+                }
+            }
+            .navigationTitle("Photo Notes")
+            .toolbar{
+                Button("Done"){
+                    showNotes = false
+                }
+            }
         }
     }
     
@@ -60,7 +87,7 @@ struct PhotoDetail: View {
             }
             
             Button {
-    
+                showNotes = true
             } label: {
                 Label("Note", systemImage: "info.circle")
                     .font(.system(size: 24))

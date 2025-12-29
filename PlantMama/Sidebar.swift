@@ -20,7 +20,7 @@ struct Sidebar: View {
             VStack{
                 NavigationLink{
                     //PhotoPicker(plant:$plant)
-                    CameraView(plant: $plant, updatingProfile: false, profilePic: $plant.profilePic)
+                    CameraView(plant: $plant, profilePic: $plant.profilePic, updatingProfile: false)
                         
                 } label: {
                     Image(systemName: "camera")

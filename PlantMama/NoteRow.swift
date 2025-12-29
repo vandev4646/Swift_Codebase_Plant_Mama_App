@@ -21,6 +21,11 @@ struct NoteRow: View {
                             Text(note.title)
                                 .foregroundColor(.dotBrown)
                                 .fontWeight(.semibold)
+                            Spacer()
+                            Button(action: {
+                                
+                            }, label: {Label("", systemImage: "chevron.right.circle").foregroundColor(.dotBrown)
+                                .fontWeight(.semibold)})
                         }.padding()
                         
                         HStack {

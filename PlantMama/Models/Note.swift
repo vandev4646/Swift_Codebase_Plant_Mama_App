@@ -8,6 +8,25 @@
 import SwiftUI
 import SwiftData
 
+
+extension PlantSchemaV3{
+    @Model
+    class Note: Identifiable, Hashable {
+        var id: UUID
+        var title: String
+        var date: Date
+        var plant: Plant?
+        var photos: [Photo]?
+        
+        init(id: UUID = UUID(), title: String, date: Date) {
+            self.id = id
+            self.title = title
+            self.date = date
+        }
+    }
+}
+
+
 extension PlantSchemaV2{
     @Model
     class Note: Identifiable, Hashable {

@@ -50,7 +50,7 @@ struct SetProfilePic: View {
                //     .opacity(0.9)
                 
                 NavigationLink{
-                    CameraView(plant: $plant, updatingProfile: true, profilePic: $profilePic)
+                    CameraView(plant: $plant, profilePic: $profilePic, updatingProfile: true)
                 } label: {
                     Text("Click to set profile pic")
                         .font(.title3)

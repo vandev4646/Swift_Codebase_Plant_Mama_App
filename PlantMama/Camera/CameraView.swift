@@ -12,6 +12,25 @@ struct CameraView: View {
     @Environment(\.dismiss) var dismiss
     var updatingProfile: Bool
     @Binding var profilePic: Photo
+    @Binding var addingNote: Note?
+    
+    init(
+            plant: Binding<Plant>,
+            profilePic: Binding<Photo>,
+            updatingProfile: Bool,
+            addingNote: Binding<Note?> = .constant(nil) // Default value
+        ) {
+            // Initialize StateObject
+            self._model = StateObject(wrappedValue: DataModel())
+            
+            // Initialize Bindings (using underscore to access the Binding itself)
+            self._plant = plant
+            self._profilePic = profilePic
+            self._addingNote = addingNote
+            
+            // Initialize standard property
+            self.updatingProfile = updatingProfile
+        }
     
     
     var body: some View {
@@ -57,15 +76,25 @@ struct CameraView: View {
             Spacer()
 
             NavigationLink {
-                PhotoPicker(plant:$plant, updatingProfile: updatingProfile, profilePic: $profilePic)
-                //PhotoCollectionView(photoCollection: model.photoCollection)
-                    .onAppear {
-                        model.camera.isPreviewPaused = true
-                    }
-                    .onDisappear {
-                        dismiss()
-                       // model.camera.isPreviewPaused = false
-                    }
+                if self.addingNote == nil {
+                    PhotoPicker(plant:$plant, updatingProfile: updatingProfile, profilePic: $profilePic)
+                        .onAppear {
+                            model.camera.isPreviewPaused = true
+                        }
+                        .onDisappear {
+                            dismiss()
+                        }
+                }
+                else{
+                    PhotoPicker(plant:$plant, updatingProfile: updatingProfile, profilePic: $profilePic, addingNote: self.$addingNote)
+                        .onAppear {
+                            model.camera.isPreviewPaused = true
+                        }
+                        .onDisappear {
+                            dismiss()
+                        }
+                }
+                
                 
             } label: {
                 Label {
@@ -76,13 +105,25 @@ struct CameraView: View {
             }
             
                 NavigationLink {
-                    PhotoPicker(plant:$plant, updatingProfile: updatingProfile, profilePic: $profilePic)
-                        .onAppear {
-                            model.camera.takePhoto()
-                        }
-                        .onDisappear {
-                            dismiss()
-                        }
+                    if self.addingNote == nil {
+                        PhotoPicker(plant:$plant, updatingProfile: updatingProfile, profilePic: $profilePic)
+                            .onAppear {
+                                model.camera.takePhoto()
+                            }
+                            .onDisappear {
+                                dismiss()
+                            }
+                    }
+                    else{
+                        PhotoPicker(plant:$plant, updatingProfile: updatingProfile, profilePic: $profilePic, addingNote: self.$addingNote)
+                            .onAppear {
+                                model.camera.takePhoto()
+                            }
+                            .onDisappear {
+                                dismiss()
+                            }
+                    }
+                    
             } label: {
                 Label {
                     Text("Take Photo")

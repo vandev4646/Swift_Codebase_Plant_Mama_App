@@ -8,6 +8,39 @@
 import SwiftUI
 import SwiftData
 
+extension PlantSchemaV3 {
+    @Model
+    class Photo: Identifiable, Hashable{
+        var id: UUID
+        var fileName: String = ""
+        var url: URL {
+                if fileName.hasPrefix("bundle://") {
+                    // Logic for Bundle images
+                    let resourceName = fileName.replacingOccurrences(of: "bundle://", with: "")
+                    return Bundle.main.url(forResource: resourceName, withExtension: "png")!
+                } else {
+                    // Logic for Sandbox images (reconstructed dynamically)
+                    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                    return documentsURL.appendingPathComponent(fileName)
+                }
+            }
+        var plant: Plant?
+        var notes: [Note]?
+        
+        init(id: UUID = UUID(), fileName: String) {
+            self.id = id
+            self.fileName = fileName
+        }
+    }
+    
+    
+}
+
+extension PlantSchemaV3.Photo: Equatable {
+    static func ==(lhs: PlantSchemaV3.Photo, rhs: PlantSchemaV3.Photo) -> Bool {
+        return lhs.id == rhs.id && lhs.id == rhs.id
+    }
+}
 
 extension PlantSchemaV2 {
     @Model

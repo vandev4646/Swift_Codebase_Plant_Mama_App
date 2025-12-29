@@ -25,7 +25,8 @@ struct ReminderRow: View {
                                 //context.delete(reminder)
                                 cancelNotification(identifer: reminder.id.uuidString)
                                 plant.reminders.removeAll(where: { $0.id == reminder.id })
-                            }, label: {Label("", systemImage: "trash")})
+                            }, label: {Label("", systemImage: "trash").foregroundColor(.dotBrown)
+                                .fontWeight(.semibold)})
                         }.padding()
                         
                         HStack {

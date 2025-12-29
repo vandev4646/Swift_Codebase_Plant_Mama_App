@@ -20,11 +20,13 @@ struct PlantDetail: View {
                 
                 VStack{
                     TitleView(plant: plant, size: geometry.size.width)
-                    HStack{
-                        DetailsView(plant: plant, size: ((geometry.size.height)*(2/5)))
-                        Sidebar(size:((geometry.size.height)*(1/3)), plant: $plant, addingReminder: $addingReminder, isEditing: $isEditing, addingNote: $addingNote)
+                    ScrollView{
+                        HStack{
+                            DetailsView(plant: plant, size: ((geometry.size.height)*(2/5)))
+                            Sidebar(size:((geometry.size.height)*(1/3)), plant: $plant, addingReminder: $addingReminder, isEditing: $isEditing, addingNote: $addingNote)
+                        }
+                        SegmentView(plant: $plant)
                     }
-                    SegmentView(plant: $plant)
                 }
                 .sheet(isPresented: $addingReminder) {
                     NavigationView {
@@ -33,7 +35,7 @@ struct PlantDetail: View {
                 }
                 .sheet(isPresented: $addingNote) {
                     NavigationView {
-                        AddNote(plant: plant, addingNote: $addingNote)
+                        AddNote(plant: $plant, addingNote: $addingNote)
                     }
                 }
                 .background(

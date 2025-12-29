@@ -50,13 +50,31 @@ struct SegmentView: View {
             .padding(.top)
             
             if selection == .photos {
-                PhotoRow(plant: plant)
+                if !plant.photos.isEmpty {
+                    PhotoRow(plant: plant)
+                }
+                else{
+                    ContentUnavailableView("No Photos", systemImage: "camera", description: Text("Click on the camera icon on the right sidebar to add photos for this plant."))
+                }
+                
             }
             else if(selection == .reminders) {
-                ReminderRow(plant: $plant)
+                if !plant.reminders.isEmpty {
+                    ReminderRow(plant: $plant)
+                }
+                else{
+                    ContentUnavailableView("No Reminders", systemImage: "timer", description: Text("Click on the timer icon on the right sidebar to add reminders for this plant."))
+                }
+                
             }
             else {
-                NoteRow(plant: $plant)
+                if !plant.noteList.isEmpty {
+                    NoteRow(plant: $plant)
+                }
+                else{
+                    ContentUnavailableView("No Notes", systemImage: "note.text.badge.plus", description: Text("Click on the note icon on the right sidebar to add a note for this plant."))
+                }
+                
             }
         }
     }
