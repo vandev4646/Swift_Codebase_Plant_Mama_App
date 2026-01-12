@@ -45,11 +45,10 @@ struct DetailsRow: View {
                 .fontWeight(.semibold)
                 .modifier(FontStyle(size: 20))
             Spacer()
-            //ScrollView{
                 Text(value)
                     .foregroundColor(.dotBrown)
                     .modifier(FontStyle(size: 20))
-          //  }
+          
         }
     }
 }
@@ -64,11 +63,13 @@ struct DetailsRowScroll: View {
                 .foregroundColor(.dotBrown)
                 .fontWeight(.semibold)
                 .modifier(FontStyle(size: 20))
+                .lineLimit(1...4)
             Spacer()
             ScrollView{
                 Text(value)
                     .foregroundColor(.dotBrown)
                     .modifier(FontStyle(size: 20))
+                    .lineLimit(1...4)
             }
         }
     }

@@ -35,7 +35,7 @@ struct PlantDetail: View {
                 }
                 .sheet(isPresented: $addingNote) {
                     NavigationView {
-                        AddNote(plant: $plant, addingNote: $addingNote)
+                        AddNote(plant: $plant, note: nil)
                     }
                 }
                 .background(

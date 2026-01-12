@@ -9,28 +9,50 @@
 import SwiftUI
 import UserNotifications
 
+
+enum Frequency: String, CaseIterable, Identifiable {
+    case once = "Once"
+    case daily = "Daily"
+    case weekly = "Weekly"
+    case monthly = "Monthly"
+    var id: String { self.rawValue }
+}
+
 struct AddReminder: View {
     let plant: Plant
     @State private var reminder = Reminder(title: "", detail: "", date: Date())
     @Binding var addingReminder: Bool
     @State var permissionDenied = false
     
+    @State private var selectedFrequency: Frequency = .once
+    @State private var monthInterval: Int = 1
+    
     let notificationCenter = UNUserNotificationCenter.current()
     
     
     var body: some View {
         List {
-            VStack (alignment: .center) {
-                TextField("Reminder Details", text: $reminder.title).font(.title2)
-                DatePicker("Date", selection: $reminder.date)
-                    .labelsHidden()
-                    .listRowSeparator(.hidden)
-                
-            }.padding()
+            Section(header: Text("Reminder Info")){
+                VStack (alignment: .center) {
+                    TextField("Reminder Details", text: $reminder.title).font(.title2)
+                    DatePicker("Date", selection: $reminder.date)
+                        .labelsHidden()
+                        .listRowSeparator(.hidden)
+                    
+                }.padding()
+            }
             
+            Section(header: Text("Frequency")){
+                Picker ("Repeat", selection: $selectedFrequency){
+                    ForEach(Frequency.allCases){
+                        freq in Text(freq.rawValue).tag(freq)
+                    }
+                }
+            }
             Button(action: {
                 plant.reminders.append(reminder)
-                scheduleNotification(title: plant.name + "'s" + " reminder", body: reminder.title, date: reminder.date, identifier: reminder.id.uuidString)
+                scheduleNotification(title: plant.name + "'s" + " reminder", body: reminder.title, date: reminder.date, identifier: reminder.id.uuidString,
+                                     frequency: selectedFrequency, interval: monthInterval)
                 addingReminder.toggle()
             }, label: {Label("Add Reminder", systemImage: "plus")}).disabled(permissionDenied || reminder.title.isEmpty)
            
@@ -53,7 +75,7 @@ struct AddReminder: View {
         
     }
     
-    func scheduleNotification(title: String, body: String, date: Date, identifier: String) {
+    func scheduleNotification(title: String, body: String, date: Date, identifier: String, frequency: Frequency, interval: Int) {
         
         notificationCenter.getNotificationSettings { (settings) in
             DispatchQueue.main.async {
@@ -63,9 +85,26 @@ struct AddReminder: View {
                     content.title = title
                     content.body = body
                     
-                    let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+                    //let dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+                    var dateComp: DateComponents
+                    var repeats = false
+                    switch frequency {
+                    case .once:
+                        dateComp = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+                        repeats = false
+                    case .daily:
+                        dateComp = Calendar.current.dateComponents([.hour, .minute], from: date)
+                        repeats = true
+                    case .weekly:
+                        dateComp = Calendar.current.dateComponents([.weekday, .hour, .minute], from: date)
+                        repeats = true
+                    case .monthly:
+                        dateComp = Calendar.current.dateComponents([.day, .hour, .minute], from: date)
+                        repeats = true
+                        
+                    }
                     
-                    let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: false)
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: dateComp, repeats: repeats)
                     let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
                     
                     self.notificationCenter.add(request) { (error) in

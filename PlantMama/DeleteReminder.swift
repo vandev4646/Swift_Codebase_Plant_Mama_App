@@ -7,7 +7,7 @@
 
 import UserNotifications
 import _SwiftData_SwiftUI
-import SwiftUICore
+import SwiftUI
 
 func cancelNotification (identifer: String){
     UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifer])

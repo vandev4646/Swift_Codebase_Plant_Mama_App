@@ -14,6 +14,7 @@ struct NoteRow: View {
     var body: some View {
         ScrollView{
             ForEach($plant.noteList, id: \.self){ $note in
+                
                 ZStack{
                     CardBackground()
                     VStack(alignment: .leading){
@@ -22,10 +23,11 @@ struct NoteRow: View {
                                 .foregroundColor(.dotBrown)
                                 .fontWeight(.semibold)
                             Spacer()
-                            Button(action: {
-                                
-                            }, label: {Label("", systemImage: "chevron.right.circle").foregroundColor(.dotBrown)
-                                .fontWeight(.semibold)})
+                            NavigationLink(destination: AddNote(plant: $plant, note: note)){
+                                 Label("", systemImage: "chevron.right.circle").foregroundColor(.dotBrown)
+                                    .fontWeight(.semibold)
+                            }
+                            
                         }.padding()
                         
                         HStack {

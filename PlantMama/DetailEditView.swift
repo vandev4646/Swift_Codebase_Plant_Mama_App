@@ -125,8 +125,10 @@ struct DetailsEditsRow: View {
         HStack {
             Text(label).frame(width: .infinity).padding(.trailing)
             Spacer()
-            TextField(label, text: $value)
-                .bold().frame( alignment: .trailing)
+            TextField(label, text: $value, axis: .vertical)
+                .bold()
+                .frame( alignment: .trailing)
+                .lineLimit(1...4)
         }
     }
 }
