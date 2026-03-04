@@ -65,7 +65,7 @@ struct PhotoDetail: View {
             .toolbar{
                 Button("Done"){
                     showNotes = false
-                }
+                }.tint(Color(.dotBrown))
             }
         }
     }

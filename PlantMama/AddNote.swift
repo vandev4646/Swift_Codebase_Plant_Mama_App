@@ -107,7 +107,7 @@ struct AddNote: View {
                 ToolbarItem(placement: .confirmationAction){
                     Button(editingNote ? "Done" : "Edit"){
                         editingNote.toggle()
-                    }
+                    }.tint(Color(.dotBrown))
                 }
             }
             

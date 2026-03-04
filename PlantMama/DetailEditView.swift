@@ -90,6 +90,7 @@ struct DetailEditView: View {
                             errorWrapper = ErrorWrapper(error: error, guidance: "New Plant was not created. Try again later.")
                         }
                     }.disabled(name.isEmpty)
+                        .tint(Color(.dotBrown))
                 }
             }
             .sheet(item: $errorWrapper) {

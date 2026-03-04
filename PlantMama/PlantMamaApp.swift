@@ -19,6 +19,10 @@ struct PlantMamaApp: App {
     let container: ModelContainer
     
     init() {
+    
+        //UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: Color(.dotBrown)]
+        //UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: Color(.dotBrown)]
+
         do {
             // 1. Define the current schema explicitly
             let schema = Schema([

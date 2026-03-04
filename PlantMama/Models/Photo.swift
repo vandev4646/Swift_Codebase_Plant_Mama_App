@@ -32,8 +32,6 @@ extension PlantSchemaV3 {
             self.fileName = fileName
         }
     }
-    
-    
 }
 
 extension PlantSchemaV3.Photo: Equatable {

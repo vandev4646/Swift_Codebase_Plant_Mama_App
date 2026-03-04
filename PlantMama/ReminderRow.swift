@@ -22,7 +22,6 @@ struct ReminderRow: View {
                                 .fontWeight(.semibold)
                             Spacer()
                             Button(action: {
-                                //context.delete(reminder)
                                 cancelNotification(identifer: reminder.id.uuidString)
                                 plant.reminders.removeAll(where: { $0.id == reminder.id })
                             }, label: {Label("", systemImage: "trash").foregroundColor(.dotBrown)
