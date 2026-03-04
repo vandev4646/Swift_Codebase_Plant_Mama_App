@@ -20,7 +20,7 @@ struct DetailsView: View {
                 VStack{
                         DetailsRow(label: "Name", value: plant.name)
                             .padding(5)
-                    DetailsRow(label: "Age", value: String(format: "%.f", age(yearPurchased: plant.datePurChased))+" Years" )
+                        DetailsRow(label: "Age", value: ageFormatted(datePurchased: plant.datePurChased))
                             .padding(5)
                         DetailsRow(label: "Type", value: plant.type)
                             .padding(5)
@@ -75,11 +75,15 @@ struct DetailsRowScroll: View {
     }
 }
 
-func age(yearPurchased: Date) -> Double {
-    let components = Calendar.current.dateComponents([.month], from: yearPurchased, to: Date())
-    guard let months = components.month else { return 0.0 }
-    return Double(months)/12.0
-    
+func ageFormatted(datePurchased: Date) -> String {
+    let ageFormatter = DateComponentsFormatter()
+    // Set the units we want to potentially display
+    ageFormatter.allowedUnits = [.year, .month, .day]
+    // Specify that we want the units to be provided in a full style (e.g., "1 year, 9 months")
+    ageFormatter.unitsStyle = .full
+    // Only show at most two of the units (e.g. "1 year, 9 months", "1 month, 1 day", etc.)
+    ageFormatter.maximumUnitCount = 2
+    return ageFormatter.string(from: datePurchased, to: Date()) ?? "Unknown"
 }
 
 #Preview(traits: .plantSampleData) {
