@@ -8,10 +8,10 @@
 import SwiftUI
 import SwiftData
 
-typealias Plant = PlantSchemaV3.Plant
-typealias Photo = PlantSchemaV3.Photo
-typealias Note = PlantSchemaV3.Note
-typealias Reminder = PlantSchemaV3.Reminder
+typealias Plant = PlantSchemaV4.Plant
+typealias Photo = PlantSchemaV4.Photo
+typealias Note = PlantSchemaV4.Note
+typealias Reminder = PlantSchemaV4.Reminder
 
 @main
 struct PlantMamaApp: App {
@@ -26,10 +26,10 @@ struct PlantMamaApp: App {
         do {
             // 1. Define the current schema explicitly
             let schema = Schema([
-                PlantSchemaV3.Plant.self,
-                PlantSchemaV3.Photo.self,
-                PlantSchemaV3.Note.self,
-                PlantSchemaV3.Reminder.self
+                PlantSchemaV4.Plant.self,
+                PlantSchemaV4.Photo.self,
+                PlantSchemaV4.Note.self,
+                PlantSchemaV4.Reminder.self
             ])
             
             // 2. Configure the storage

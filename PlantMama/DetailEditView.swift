@@ -29,7 +29,7 @@ struct DetailEditView: View {
             plantToEdit = plant
             isCreatingPlant = false
         } else {
-            plantToEdit = Plant(name: "", profilePic: Photo(fileName: "bundle://Default"), type: "", details: "", reminders: [], photos: [],
+            plantToEdit = Plant(name: "", profilePic: Photo(identifier: "Default"), type: "", details: "", reminders: [], photos: [],
                 noteList: [])
             isCreatingPlant = true
         }
@@ -136,8 +136,9 @@ struct DetailsEditsRow: View {
 
 
 
-
-#Preview(traits: .plantSampleData) {
-    @Previewable @Query(sort: \Plant.name) var plants: [Plant]
-    DetailEditView(plant: plants[0], size: 700)
-}
+/*
+ #Preview(traits: .plantSampleData) {
+ @Previewable @Query(sort: \Plant.name) var plants: [Plant]
+ DetailEditView(plant: plants[0], size: 700)
+ }
+ */

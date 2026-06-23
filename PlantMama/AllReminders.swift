@@ -12,17 +12,50 @@ struct AllReminders: View {
     //@State var reminders: [Reminder]
     @Query(sort: \Reminder.date) private var reminders: [Reminder]
     
-    var body: some View {
-        ScrollView{
-            VStack{
-                ForEach(reminders, id:\.self) { reminder in
-                    ZStack{
-                        CardBackground()
-                        AllRemindersDetails(reminder: reminder)
-                    }
-                }
-            }
+        private var groupedReminders: [String: [Reminder]] {
+            Dictionary(grouping: reminders, by: { $0.plant?.name ?? "Unknown Plant" })
         }
+
+        private var plantNames: [String] {
+            groupedReminders.keys.sorted()
+        }
+    
+    var body: some View {
+        ZStack{
+            
+            if !reminders.isEmpty {
+                ScrollView{
+                    VStack(alignment: .leading, spacing:20){
+                        
+                        ForEach(plantNames, id: \.self) { name in
+                            VStack(alignment: .leading, spacing: 10) {
+                                // Section Header
+                                Text("\(name)'s: Reminders")
+                                    .font(.headline)
+                                    .foregroundColor(.dotBrown)
+                                    .padding(.horizontal)
+                                
+                                // The Reminders for this specific plant
+                                ForEach(groupedReminders[name] ?? [], id: \.self) { reminder in
+                                    ZStack{
+                                        CardBackground()
+                                        AllRemindersDetails(reminder: reminder)
+                                    }
+                                }
+                            }}}
+                    
+                }
+                
+            } else{
+                ContentUnavailableView("No Reminders", systemImage: "timer", description: Text("To add a new reminder, navigate to a plant profile. Then click on the timer icon on the right sidebar to add reminders for that plant."))
+            }
+            
+        }.background(
+            Image("MenuBackground")
+                .resizable()
+                .modifier(BackgroundStyle())
+    )
+        
     }
     
     struct AllRemindersDetails: View {
@@ -34,11 +67,10 @@ struct AllReminders: View {
                     Text(reminder.title)
                         .foregroundColor(.dotBrown)
                         .fontWeight(.semibold)
-                    Spacer()
-                    Text("For Plant: " + (reminder.plant?.name ?? " None"))
+            
                     Spacer()
                     Button(action: {
-                        cancelNotification(identifer: reminder.id.uuidString)
+                        cancelNotification(identifier: reminder.id.uuidString)
                         context.delete(reminder)
                     }, label: {
                         Label("", systemImage: "trash")
@@ -51,14 +83,29 @@ struct AllReminders: View {
                 HStack {
                     Text(reminder.date, style: .date)
                         .foregroundColor(.dotBrown)
-                        .fontWeight(.semibold)
-                    Spacer()
+                        .fontWeight(.regular)
+                    Text(":")
+                        .foregroundColor(.dotBrown)
+                        .fontWeight(.regular)
+                    //Spacer()
                     Text(reminder.date, style: .time)
                         .foregroundColor(.dotBrown)
-                        .fontWeight(.semibold)
+                        .fontWeight(.regular)
+                    Spacer()
+                    Text("Frequency: ")
+                        .foregroundColor(.dotBrown)
+                        .fontWeight(.regular)
+                    Text(reminder.frequency.rawValue)
+                        .foregroundColor(.dotBrown)
+                        .fontWeight(.regular)
                 }
                 
             }.padding()
+                .onAppear{
+                    if let plant = reminder.plant {
+                        cleanupExpiredReminders(plant: plant, context: context)
+                    }
+                }
         }
     }
 }

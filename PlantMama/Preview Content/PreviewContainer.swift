@@ -4,7 +4,7 @@
 //
 //  Created by Vanessa Bennett on 6/24/25.
 //
-
+/*
 import SwiftData
 import SwiftUI
 
@@ -24,3 +24,4 @@ struct PlantSampleData: PreviewModifier {
 extension PreviewTrait where T == Preview.ViewTraits {
     @MainActor static var plantSampleData: Self = .modifier(PlantSampleData())
 }
+*/

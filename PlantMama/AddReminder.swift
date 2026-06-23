@@ -10,7 +10,7 @@ import SwiftUI
 import UserNotifications
 
 
-enum Frequency: String, CaseIterable, Identifiable {
+enum Frequency: String, Codable, CaseIterable, Identifiable {
     case once = "Once"
     case daily = "Daily"
     case weekly = "Weekly"
@@ -20,7 +20,7 @@ enum Frequency: String, CaseIterable, Identifiable {
 
 struct AddReminder: View {
     let plant: Plant
-    @State private var reminder = Reminder(title: "", detail: "", date: Date())
+    @State private var reminder = Reminder(title: "", detail: "", date: Date(), frequency: .once)
     @Binding var addingReminder: Bool
     @State var permissionDenied = false
     
@@ -50,6 +50,8 @@ struct AddReminder: View {
                 }
             }
             Button(action: {
+                reminder.frequency = selectedFrequency
+                reminder.monthlyInterval = monthInterval
                 plant.reminders.append(reminder)
                 scheduleNotification(title: plant.name + "'s" + " reminder", body: reminder.title, date: reminder.date, identifier: reminder.id.uuidString,
                                      frequency: selectedFrequency, interval: monthInterval)

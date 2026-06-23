@@ -8,6 +8,26 @@
 import SwiftUI
 import SwiftData
 
+extension PlantSchemaV4{
+    @Model
+    class Reminder: Identifiable, Hashable {
+        var id: UUID
+        var title: String
+        var date: Date
+        var plant: Plant?
+        var frequency: Frequency
+        var monthlyInterval: Int
+        
+        init(id: UUID = UUID(), title: String, detail: String, date: Date, frequency: Frequency, monthlyInterval: Int = 1) {
+            self.id = id
+            self.title = title
+            self.date = date
+            self.frequency = frequency
+            self.monthlyInterval = monthlyInterval
+        }
+    }
+}
+
 extension PlantSchemaV3{
     @Model
     class Reminder: Identifiable, Hashable {

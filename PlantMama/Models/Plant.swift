@@ -8,6 +8,36 @@
 import SwiftUI
 import SwiftData
 
+extension PlantSchemaV4 {
+    @Model
+    class Plant: Identifiable, Hashable {
+        var id: UUID
+        var name: String
+        var profilePic: Photo
+        var datePurChased: Date
+        var type: String
+        @Attribute(originalName: "notes") var details: String
+        @Relationship(deleteRule: .cascade, inverse: \Reminder.plant)
+        var reminders : [Reminder] = []
+        @Relationship(deleteRule: .cascade, inverse: \Photo.plant)
+        var photos : [Photo] = []
+        @Relationship(deleteRule: .cascade, inverse: \Note.plant)
+        var noteList: [Note] = []
+        
+        init(id: UUID = UUID(), name: String, profilePic: Photo, datePurChased: Date = Date(), type: String, details: String, reminders: [Reminder], photos: [Photo], noteList: [Note]) {
+            self.id = id
+            self.name = name
+            self.profilePic = profilePic
+            self.datePurChased = datePurChased
+            self.type = type
+            self.details = details
+            self.reminders = reminders
+            self.photos = photos
+            self.noteList = noteList
+        }
+    }
+}
+
 extension PlantSchemaV3 {
     @Model
     class Plant: Identifiable, Hashable {

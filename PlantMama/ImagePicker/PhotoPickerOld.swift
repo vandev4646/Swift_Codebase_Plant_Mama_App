@@ -2,7 +2,7 @@
  COPIED MOST FROM CAPTURING ImageGalleryApp IOS SAMPLE APP
 See the License.txt file for this sample’s licensing information.
 */
-
+/*
 import SwiftUI
 import PhotosUI
 
@@ -63,17 +63,17 @@ class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControl
               result.itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) else { return }
         
         result.itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { url, error in
-            //if let url = url {
+            if let url = url {
                 // 1. Generate a unique name for the file
-                //let newFileName = "photo_\(UUID().uuidString).jpg"
+                let newFileName = "photo_\(UUID().uuidString).jpg"
                 
                 // 2. Get the current Documents directory
-                //let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-                //let destinationURL = documentsURL.appendingPathComponent(newFileName)
+                let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                let destinationURL = documentsURL.appendingPathComponent(newFileName)
                 
-                //do {
+                do {
                     // 3. Copy the file to the new location
-                    //try FileManager.default.copyItem(at: url, to: destinationURL)
+                    try FileManager.default.copyItem(at: url, to: destinationURL)
                     // Replace the FileManager.default.copyItem logic with this:
                     
 
@@ -138,4 +138,4 @@ class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControl
         self.parent = parent
     }
 }
-
+*/

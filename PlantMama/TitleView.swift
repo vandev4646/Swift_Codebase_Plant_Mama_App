@@ -24,25 +24,9 @@ struct TitleView: View {
                         .padding(.trailing, 10)
 
                     
-                    AsyncImage(url: plant.profilePic.url) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(minWidth: 60, maxWidth: 60 , minHeight: 60, maxHeight: 60)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            
-                    } placeholder: {
-                        ZStack {
-                             let url = Bundle.main.url(forResource: "Default", withExtension: "png")
-                             AsyncImage(url: url){
-                                 image in image
-                                     .image?.resizable()
-                                     .scaledToFill()
-                                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                             }
-                            ProgressView()
-                        }
-                    }.frame(minWidth: 60, maxWidth: 60 , minHeight: 60, maxHeight: 60)
+                    LibraryImage(identifier: plant.profilePic.identifier)
+                        .frame(minWidth: 60, maxWidth: 60 , minHeight: 60, maxHeight: 60)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     Spacer()
                 }.modifier(EntryBannerStyle())
             

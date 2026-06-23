@@ -17,6 +17,7 @@ struct ContentView: View {
     
     @State var presentSideMenu = false
     @State var selectedSideMenuTab = 0
+    @State private var showInfo = false
     
     var body: some View {
        // GeometryReader {
@@ -36,19 +37,78 @@ struct ContentView: View {
                             .tabItem {
                                         Label("Reminders", systemImage: "bell")
                                     }
+                            .tag(1)
+                        AllPhotos()
+                            .tabItem{
+                                Label("Photos", systemImage: "photo.on.rectangle.angled.fill")
+                            }
                             .tag(2)
                         DefaultView()
                              .tabItem {
                                          Label("Add Plant", systemImage: "plus")
                                      }
-                             .tag(1)
+                             .tag(3)
                     }
                     .onChange(of: selectedSideMenuTab) { newValue in
-                        if newValue == 1 {
+                        if newValue == 3 {
                             isAddingNewPlant = true
                             selectedSideMenuTab = 0
                         }
                     }
+                    if selectedSideMenuTab == 4 {
+                        // Dimmed background to focus on the pop-up
+                                Color.black.opacity(0.3)
+                                    .ignoresSafeArea()
+                                    .onTapGesture { selectedSideMenuTab = 0 } // Close if they tap outside
+
+                        VStack(alignment: .leading, spacing: 15) {
+                            Text("About Plant Mama")
+                                .font(.title3)
+                                .bold()
+                                .foregroundColor(.dotBrown)
+                                .frame(maxWidth: .infinity, alignment: .center)
+
+                            Text("Created by a plant mama, for plant mamas.")
+                                .italic()
+                                //.frame(maxWidth: .infinity)
+                            Text("This app was built to help you track your plant’s growth and stay on top of daily care.")
+                                .font(.footnote)
+
+                            VStack(alignment: .leading, spacing: 10) {
+                                Label("Your Data is Yours", systemImage: "lock.shield")
+                                    .font(.subheadline).bold()
+                                Text("No information is collected. Everything is stored on your device.")
+                                    .font(.footnote)
+
+                                Label("Photo Storage", systemImage: "photo.on.rectangle")
+                                    .font(.subheadline).bold()
+                                Text("Photos are stored in a 'Plant Mama' album. Even if the app is deleted, your photos stay in your library.")
+                                    .font(.footnote)
+
+                                Label("Important", systemImage: "exclamationmark.triangle")
+                                    .font(.subheadline).bold()
+                                Text("If you delete the app, your plant records are permanently lost, as we do not use cloud storage.")
+                                    .font(.footnote)
+                            }
+                            
+                            Button("Done") {
+                                selectedSideMenuTab = 0
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.dotBrown)
+                            .frame(maxWidth: .infinity)
+                        }
+                        .padding()
+
+                                .background(
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(Color.white)
+                                )
+                                .padding(40) // Space from screen edges
+                                .transition(.scale.combined(with: .opacity))
+                            }
+                        //}
+                        //.animation(.spring(), value: selectedSideMenuTab)
                     SideMenu(isShowing: $presentSideMenu, content: AnyView(SideMenuView(selectedSideMenuTab: $selectedSideMenuTab, presentSideMenu: $presentSideMenu)))
                 }
                 
@@ -128,11 +188,11 @@ struct PlantMamaAppTitle: View {
             .padding()
     }
 }
-
+/*
 #Preview(traits: .plantSampleData) {
     ContentView()
 }
-/*
+
  struct ContentView_Previews: PreviewProvider {
  static var previews: some View {
  NavigationView {

@@ -8,17 +8,17 @@
 import SwiftData
 
 enum AppMigrationPlan: SchemaMigrationPlan {
-    // 1. List all versions in order from oldest to newest
+    // List all versions in order from oldest to newest
     static var schemas: [any VersionedSchema.Type] {
-        [PlantSchemaV1.self, PlantSchemaV2.self, PlantSchemaV3.self]
+        [PlantSchemaV1.self, PlantSchemaV2.self, PlantSchemaV3.self, PlantSchemaV4.self]
     }
     
-    // 2. Define the stages of migration
+    // Define the stages of migration
     static var stages: [MigrationStage] {
-        [migrateV1toV2, migrateV2toV3]
+        [migrateV1toV2, migrateV2toV3, migrateV3toV4]
     }
     
-    // 3. Define the specific logic for the V1 to V2 move
+    // Define the specific logic for the V1 to V2 move
     static let migrateV1toV2 = MigrationStage.lightweight(
         fromVersion: PlantSchemaV1.self,
         toVersion: PlantSchemaV2.self
@@ -43,6 +43,11 @@ enum AppMigrationPlan: SchemaMigrationPlan {
             try context.save()
         },
         didMigrate: nil
+    )
+    
+    static let migrateV3toV4 = MigrationStage.lightweight(
+        fromVersion: PlantSchemaV3.self,
+        toVersion: PlantSchemaV4.self
     )
 
 }

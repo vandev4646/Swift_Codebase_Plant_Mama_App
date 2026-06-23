@@ -9,7 +9,10 @@ import os.log
 
 final class DataModel: ObservableObject {
     let camera = Camera()
-    let photoCollection = PhotoCollection(smartAlbum: .smartAlbumUserLibrary)
+    let photoCollection = PhotoCollection(
+        albumNamed: "Plant Mama",
+        createIfNotFound: true
+    )
     
     @Published var viewfinderImage: Image?
     @Published var thumbnailImage: Image?

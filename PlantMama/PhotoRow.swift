@@ -17,7 +17,7 @@ struct PhotoRow: View {
                 ForEach (plant.photos){
                     photo in GeometryReader{
                         geo in
-                        NavigationLink(destination: PhotoDetail(plant: plant, photo: photo)){
+                        NavigationLink(destination: PhotoDetail(plant: plant, photo: photo, type: .plant)){
                             PhotoCardView(size: geo.size.width, photo: photo)
                         }
                     }

@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct DisplayCard: View {
-    var imageModel: ImageModel? //need to use this eventually
     let plant: Plant
     let size: Double
     var isEditing: Bool = false
@@ -20,28 +19,13 @@ struct DisplayCard: View {
         
         ZStack(alignment: .bottom) {
             if !isEditing {
-                AsyncImage(url: plant.profilePic.url) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                    //.clipped()
-                        
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                } placeholder: {
-                    ZStack{
-                        let url = Bundle.main.url(forResource: "Default", withExtension: "png")
-                        AsyncImage(url: url) {
-                            image in image
-                                .image?.resizable()
-                                .scaledToFill()
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                        }
-                        Text("Loading Image...")
-                            .modifier(FontStyle(size: 12))
-                    }
-
-                }.frame(minWidth: size, maxWidth: size , minHeight: size, maxHeight: size)
-                
+                LibraryImage(identifier: plant.profilePic.identifier, size: CGSize(width: size, height: size))
+                                    .frame(width: size, height: size)
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                                    .overlay {
+                                        // Optional: Show "Loading" only if no image is loaded yet
+                                        // You can adjust the Modifier to signal loading state if needed
+                                    }
             }
             
             ZStack(alignment: .center){
@@ -66,33 +50,10 @@ struct DisplayCard: View {
     }
 }
 
-struct ImageModel: Codable {
-    
-    enum Location: String, Codable {
-        case resources, documents
-    }
-    var fileName: String?
-    var location = Location.documents
-    
-    var url: URL? {
-        if location == .resources {
-            if let jpegImage = Bundle.main.url(forResource: fileName, withExtension: "jpeg") {
-                return jpegImage
-            } else {
-                return Bundle.main.url(forResource: fileName, withExtension: "png")
-            }
-        } else {
-            guard let fileName else {
-                return nil
-            }
-            let documentDirectory = FileManager.default.documentDirectory
-            return documentDirectory?.appendingPathComponent(fileName)
-        }
-        
-    }
-}
 
-#Preview {
-    let plant = Plant.sampleData[0]
-    DisplayCard(plant: plant, size: 200)
-}
+/*
+ #Preview {
+ let plant = Plant.sampleData[0]
+ DisplayCard(plant: plant, size: 200)
+ }
+ */

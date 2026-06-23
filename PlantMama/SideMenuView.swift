@@ -10,28 +10,40 @@ import SwiftUI
 
 enum SideMenuRowType: Int, CaseIterable {
     case home = 0
-    case addlant
     case allReminders
+    case allPhotos
+    case addPlant
+    case info
+    
+    
     
     var title: String {
         switch self {
         case .home:
             return "Home"
-        case .addlant:
+        case .addPlant:
             return "Add New Plant"
         case .allReminders:
             return "All Reminders"
+        case .allPhotos:
+            return "All Photos"
+        case .info:
+            return "Info"
         }
     }
     
     var iconName: String {
         switch self {
         case .home:
-            return "home"
-        case .addlant:
+            return "house"
+        case .addPlant:
             return "plus"
         case .allReminders:
             return "bell"
+        case .allPhotos:
+            return "photo.on.rectangle.angled.fill"
+        case .info:
+            return "info.square"
         }
     }
     
@@ -88,7 +100,7 @@ struct SideMenuView: View {
                         .frame(width: 5)
                     
                     ZStack{
-                        Image(imageName)
+                        Image(systemName: imageName)
                             .resizable()
                             .renderingMode(.template)
                             .foregroundColor(isSelected ? .black : .gray)

@@ -44,8 +44,7 @@ struct PlantEditor: View {
 
                 Button(role: .destructive, action: {
                     isDeleted = true
-                    dismiss()
-                    context.delete(plant)
+                    
                 }, label: {
                     Label("Delete Plant", systemImage: "trash.circle.fill")
                         .font(.title2)
@@ -54,25 +53,33 @@ struct PlantEditor: View {
                     .padding(50)
             }
             
-        }.overlay(alignment: .center) {
-            if isDeleted {
-                Color(UIColor.systemBackground)
-                Text("Event Deleted. Select an Event.")
-                    .foregroundStyle(.secondary)
+        }
+        .confirmationDialog("Are you sure?", isPresented: $isDeleted, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                Task {
+                    
+                    context.delete(plant)
+                    dismiss()
+                    
+                }
             }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+                Text("Deleting this plant is permanent and will remove all reminders, notes, and photos associated with it.")
+            
         }
         
     }
     
     
 }
-
+/*
 #Preview(traits: .plantSampleData) {
     @Previewable @Query(sort: \Plant.name) var plants: [Plant]
     PlantEditor(plant: plants[0])
 }
 
-/*
+
  struct PlantEditor_Previews: PreviewProvider {
  static var previews: some View {
  PlantEditor(plant: .constant(Plant(backingData: <#any BackingData<Plant>#>))).environmentObject(PlantData())

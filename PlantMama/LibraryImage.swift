@@ -8,63 +8,63 @@
 import SwiftUI
 import Photos
 
-struct PhotoLibraryAssetModifier: ViewModifier {
+struct LibraryImage: View {
     let identifier: String
+    var size: CGSize? = nil
     @State private var loadedImage: UIImage? = nil
-    @State private var lastLoadedID: String = "" // Track what we actually loaded
 
-    func body(content: Content) -> some View {
-        Group {
+    var body: some View {
+        ZStack {
             if let image = loadedImage {
                 Image(uiImage: image)
                     .resizable()
+                    .scaledToFill()
             } else {
-                content
+                // Placeholder while loading or if it's the "Default"
+                Image("Default")
+                    .resizable()
+                    .scaledToFill()
             }
         }
+        .frame(width: size?.width, height: size?.height)
         .task(id: identifier) {
-            // ONLY load if the ID has actually changed and we haven't loaded it yet
-            if identifier != lastLoadedID {
-                await loadImage()
-            }
+            // Guard against default and only load if missing
+            guard identifier != "Default", !identifier.isEmpty else { return }
+            await loadImage()
         }
     }
 
     private func loadImage() async {
-        guard identifier != "Default", !identifier.isEmpty else { return }
-
-        let results = PHAsset.fetchAssets(withLocalIdentifiers: [identifier], options: nil)
+        let fetchOptions = PHFetchOptions()
+        let results = PHAsset.fetchAssets(
+            withLocalIdentifiers: [identifier],
+            options: fetchOptions
+        )
         guard let asset = results.firstObject else { return }
-
+        let targetSize = size ?? CGSize(width: 1000, height: 1000)
         let options = PHImageRequestOptions()
         options.isNetworkAccessAllowed = true
-        options.deliveryMode = .opportunistic // Faster for grids
+        options.deliveryMode = .opportunistic
         options.isSynchronous = false
 
-        let image: UIImage? = await withCheckedContinuation { continuation in
+        // Request image asynchronously
+        let fetchedImage: UIImage? = await withCheckedContinuation { continuation in
             PHImageManager.default().requestImage(
                 for: asset,
-                targetSize: CGSize(width: 400, height: 400), // Keep size small for the grid!
+                targetSize: targetSize,
                 contentMode: .aspectFill,
                 options: options
             ) { result, info in
-                // Only resume for the final image, not the placeholder
                 let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool ?? false
-                if !isDegraded {
-                    continuation.resume(returning: result)
-                }
+                if !isDegraded { continuation.resume(returning: result) }
             }
         }
-        
-        await MainActor.run {
-            self.loadedImage = image
-            self.lastLoadedID = identifier // Mark this ID as "done"
+
+        if let fetchedImage {
+            await MainActor.run {
+                self.loadedImage = fetchedImage
+            }
         }
     }
 }
 
-extension View {
-    func loadFromLibrary(id: String, size: CGSize = CGSize(width: 1024, height: 1024)) -> some View {
-        self.modifier(PhotoLibraryAssetModifier(identifier: id))
-    }
-}

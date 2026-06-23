@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SetProfilePic: View {
-    var imageModel: ImageModel? //need to use this eventually
     @State var plant: Plant
     @Binding var profilePic: Photo
     var isEditing: Bool = false
@@ -20,25 +19,12 @@ struct SetProfilePic: View {
         
         ZStack(alignment: .bottom) {
             if !isEditing {
-                AsyncImage(url: plant.profilePic.url) { image in
-                    image
-                        .resizable()
+                LibraryImage(identifier: profilePic.identifier, size: CGSize(width: size, height: size))
+                        //.resizable()
                         .scaledToFill()
                         .frame(minWidth: size, maxWidth: size , minHeight: size, maxHeight: size)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
-                } placeholder: {
-                    ZStack{
-                        let url = Bundle.main.url(forResource: "Default", withExtension: "png")
-                        AsyncImage(url: url){
-                            image in image
-                                .image?.resizable()
-                                .scaledToFill()
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                        Text("Loading Image...")
-                            .modifier(FontStyle(size: 12))
-                    }
-                }.frame(minWidth: size, maxWidth: size , minHeight: size, maxHeight: size)
+                
                 
             }
             

@@ -32,6 +32,7 @@ struct AddNote: View {
     @Environment(\.modelContext) private var context
     @State private var errorWrapper: ErrorWrapper?
     @State private var editingNote: Bool = false
+    @State private var deleteNote: Bool = false
     
     init(plant: Binding<Plant>, note: Note?) {
         self._plant = plant
@@ -59,7 +60,7 @@ struct AddNote: View {
         else {
             List {
                 VStack (alignment: .leading) {
-                    TextField("Note", text: $title, axis: .vertical).font(.title2)
+                    TextField("Note *", text: $title, axis: .vertical).font(.title2)
                         .lineLimit(1...4)
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                         .labelsHidden()
@@ -67,11 +68,14 @@ struct AddNote: View {
                     
                 }.padding()
                 HStack{
+                    /*
                     Button(action: {
                         isAddingPhoto = true
                     }, label: {Label("Add Photo", systemImage: "photo.badge.plus.fill")})
                     .disabled(title.isEmpty)
                     .buttonStyle(.borderless)
+                    .opacity(title.isEmpty ? 0.5: 1.0)
+                     */
                     Spacer()
                     Button(action: {
                         do {
@@ -85,19 +89,24 @@ struct AddNote: View {
                     }, label: {Label("Save!", systemImage: "plus.circle.fill")})
                     .disabled(title.isEmpty)
                     .buttonStyle(.borderless)
+                    .opacity(title.isEmpty ? 0.5: 1.0)
                     
                 }
                 if !isCreatingNote{
                     Button(action: {
-                        plant.noteList.removeAll(where: { $0.id == note.id })
-                        dismiss()
+                        deleteNote = true
                     }, label: {Label("Delete Note", systemImage: "trash")})
                     .disabled(title.isEmpty)
                     .buttonStyle(.borderless)
+                    .opacity(title.isEmpty ? 0.5: 1.0)
                 }
                 
                 ScrollView{
-                    NotePhotoGridView(note: $note, columns: gridColumns)
+                    NotePhotoGridView(
+                        note: $note,
+                        photos: $plant.photos,
+                        columns: gridColumns
+                    )
                 }
             }
         }
@@ -112,8 +121,20 @@ struct AddNote: View {
             }
             
         }
-        .navigationDestination(isPresented: $isAddingPhoto){
+        .fullScreenCover(isPresented: $isAddingPhoto){
             CameraView(plant: $plant, profilePic: $plant.profilePic, updatingProfile: false, addingNote: optionalNoteBinding)
+        }
+        .confirmationDialog("Are you sure you want to delete this note?", isPresented: $deleteNote, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                plant.noteList.removeAll(where: { $0.id == note.id })
+                    context.delete(note)
+                dismiss()
+                                
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+                Text("This action is permanent.")
+            
         }
         
         

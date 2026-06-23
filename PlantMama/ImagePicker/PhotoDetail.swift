@@ -7,30 +7,19 @@ import SwiftUI
 import Photos
 
 struct PhotoDetail: View {
-    var plant: Plant
+    var plant: Plant?
     @State var photo: Photo
     @Environment(\.dismiss) var dismiss
     private let imageSize = CGSize(width: 1024, height: 1024)
     @State private var showNotes = false
+    var type: PhotoDeleteType
+    @Environment(\.modelContext) private var context
+    @State private var showingDeleteConfirmation = false
+    @State private var showingDeleteError = false
     
     var body: some View {
         Group {
-            AsyncImage(url: photo.url) { image in
-                image
-                    .resizable()
-                    .scaledToFit()
-            } placeholder: {
-                ZStack{
-                    let url = Bundle.main.url(forResource: "Default", withExtension: "png")
-                    AsyncImage(url: url){
-                        image in image
-                            .image?.resizable()
-                            .scaledToFit()
-                    }
-                    ProgressView()
-                }
-                
-            }
+            LibraryImage(identifier: photo.identifier)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
@@ -44,6 +33,31 @@ struct PhotoDetail: View {
         .sheet(isPresented: $showNotes){
             noteSheet
         }
+        .confirmationDialog("Are you sure?", isPresented: $showingDeleteConfirmation, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                Task {
+                    let result = deletePhoto(photo: photo, type: type, context: context)
+                    if result == -1 {
+                                showingDeleteError = true
+                            } else {
+                                dismiss()
+                            }
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            if type == .all {
+                Text("If you delete this photo it will be deleted from all plants and notes it is associated with.")
+            } else {
+                Text("Are you sure you want to delete this photo?")
+            }
+        }
+        .alert("Cannot Delete Photo", isPresented: $showingDeleteError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("This photo is the plant's profile picture. You cannot delete a photo if it is a current profile picture. Change the profile picture before deleting this photo.")
+        }
+
     }
     
     private var noteSheet: some View {
@@ -72,26 +86,19 @@ struct PhotoDetail: View {
     
     func buttonsView() -> some View {
         HStack(spacing: 60) {
-
-            Button {
-                Task {
-                    FileManager.default.removeItemFromDocumentDirectory(url: photo.url)
-                    plant.photos.removeAll { $0.id == photo.id }
-                    await MainActor.run {
-                        dismiss()
-                    }
+                Button {
+                    showingDeleteConfirmation = true
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                        .font(.system(size: 24))
                 }
-            } label: {
-                Label("Delete", systemImage: "trash")
-                    .font(.system(size: 24))
-            }
-            
-            Button {
-                showNotes = true
-            } label: {
-                Label("Note", systemImage: "info.circle")
-                    .font(.system(size: 24))
-            }
+                
+                Button {
+                    showNotes = true
+                } label: {
+                    Label("Note", systemImage: "info.circle")
+                        .font(.system(size: 24))
+                }
         }
         .buttonStyle(.plain)
         .labelStyle(.iconOnly)

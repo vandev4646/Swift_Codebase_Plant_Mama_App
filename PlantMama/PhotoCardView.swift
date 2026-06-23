@@ -13,32 +13,15 @@ struct PhotoCardView: View {
     
     var body: some View {
        // ZStack(alignment: .topTrailing) {
-            AsyncImage(url: photo.url) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                ZStack{
-                    let url = Bundle.main.url(forResource: "Default", withExtension: "png")
-                    AsyncImage(url: url){
-                        image in image
-                            .image?.resizable()
-                            .scaledToFill()
-                    }
-                    ProgressView()
-                }
-                
-            }
-            .frame(width: size, height: size)
-            //Text(photo.url.absoluteString)
-      //  }
+        LibraryImage(identifier: photo.identifier, size: CGSize(width: size, height: size))
+                    .frame(width: size, height: size)
+                    .clipped() // Ensures image doesn't bleed outside the frame
     }
 }
 
 struct PhotoCardView_Previews: PreviewProvider {
     static var previews: some View {
-        if let url = Bundle.main.url(forResource: "Default", withExtension: "png") {
-            PhotoCardView (size: 50, photo: Photo( fileName:"Bundle://Default"))
-        }
+        PhotoCardView(size: 100, photo: Photo(identifier: "Default"))
+                   .previewLayout(.sizeThatFits)
     }
 }

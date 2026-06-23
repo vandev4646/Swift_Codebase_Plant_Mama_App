@@ -85,12 +85,12 @@ func ageFormatted(datePurchased: Date) -> String {
     ageFormatter.maximumUnitCount = 2
     return ageFormatter.string(from: datePurchased, to: Date()) ?? "Unknown"
 }
-
+/*
 #Preview(traits: .plantSampleData) {
     @Previewable @Query(sort: \Plant.name) var plants: [Plant]
     DetailsView(plant: plants[0], size: 200)
 }
-/*
+
  struct DetailsView_Previews: PreviewProvider {
  static var previews: some View {
  DetailsView( plant: .constant(Plant()), isEditing: false, size: 200)

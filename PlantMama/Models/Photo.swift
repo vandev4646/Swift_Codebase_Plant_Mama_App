@@ -7,6 +7,34 @@
 
 import SwiftUI
 import SwiftData
+import Photos
+
+extension PlantSchemaV4 {
+    @Model
+    class Photo: Identifiable, Hashable{
+        var id: UUID
+        // Use originalName to migrate existing data from 'fileName'
+        @Attribute(originalName: "fileName")
+        var identifier: String = ""
+        var plant: Plant?
+        var notes: [Note]?
+        
+        init(id: UUID = UUID(), identifier: String) {
+            self.id = id
+            self.identifier = identifier
+        }
+        // Computed property to fetch the actual PHAsset when needed
+            @Transient
+            var asset: PHAsset? {
+                let fetchOptions = PHFetchOptions()
+                let result = PHAsset.fetchAssets(
+                    withLocalIdentifiers: [identifier],
+                    options: fetchOptions
+                )
+                return result.firstObject
+            }
+    }
+}
 
 extension PlantSchemaV3 {
     @Model
