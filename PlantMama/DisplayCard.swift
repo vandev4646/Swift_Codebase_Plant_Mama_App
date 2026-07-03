@@ -19,13 +19,20 @@ struct DisplayCard: View {
         
         ZStack(alignment: .bottom) {
             if !isEditing {
-                LibraryImage(identifier: plant.profilePic.identifier, size: CGSize(width: size, height: size))
-                                    .frame(width: size, height: size)
-                                    .clipShape(RoundedRectangle(cornerRadius: 20))
-                                    .overlay {
-                                        // Optional: Show "Loading" only if no image is loaded yet
-                                        // You can adjust the Modifier to signal loading state if needed
-                                    }
+                
+                if let uiImage = plant.profilePic.image{
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size, height: size)
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                } else {
+                    Image("Default")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: size, height: size)
+                        .background(Color(.systemGray6))
+                }
             }
             
             ZStack(alignment: .center){

@@ -9,113 +9,41 @@ import SwiftUI
 import SwiftData
 import Photos
 
-extension PlantSchemaV4 {
+//WARNING: DO NOT UPDATE THIS FILE
+
+extension PlantSchemaV1 {
     @Model
-    class Photo: Identifiable, Hashable{
-        var id: UUID
-        // Use originalName to migrate existing data from 'fileName'
-        @Attribute(originalName: "fileName")
+    class Photo {
+        @Attribute(.unique) var id: UUID
         var identifier: String = ""
-        var plant: Plant?
-        var notes: [Note]?
+        var plant: PlantSchemaV1.Plant?
+        var notes: [PlantSchemaV1.Note] = []
+        var lastUpdated: Date = Date()
+        var syncState: SyncState = SyncState.NOT_SYNCED
         
         init(id: UUID = UUID(), identifier: String) {
             self.id = id
             self.identifier = identifier
         }
-        // Computed property to fetch the actual PHAsset when needed
-            @Transient
-            var asset: PHAsset? {
-                let fetchOptions = PHFetchOptions()
-                let result = PHAsset.fetchAssets(
-                    withLocalIdentifiers: [identifier],
-                    options: fetchOptions
-                )
-                return result.firstObject
+        @Transient var image: UIImage? {
+            // 1. Locate the Documents directory
+            guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+                return nil
             }
-    }
-}
-
-extension PlantSchemaV3 {
-    @Model
-    class Photo: Identifiable, Hashable{
-        var id: UUID
-        var fileName: String = ""
-        var url: URL {
-                if fileName.hasPrefix("bundle://") {
-                    // Logic for Bundle images
-                    let resourceName = fileName.replacingOccurrences(of: "bundle://", with: "")
-                    return Bundle.main.url(forResource: resourceName, withExtension: "png")!
-                } else {
-                    // Logic for Sandbox images (reconstructed dynamically)
-                    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-                    return documentsURL.appendingPathComponent(fileName)
-                }
+            
+            // 2. Point to the "plant mama" folder and the specific file name
+            let fileURL = documentsDirectory
+                .appendingPathComponent("Plant Mama", isDirectory: true)
+                .appendingPathComponent(identifier)
+            
+            // 3. Load the data and convert it back to a UIImage
+            if let data = try? Data(contentsOf: fileURL) {
+                return UIImage(data: data)
             }
-        var plant: Plant?
-        var notes: [Note]?
-        
-        init(id: UUID = UUID(), fileName: String) {
-            self.id = id
-            self.fileName = fileName
+            
+            else {return nil}
+            
         }
-    }
-}
-
-extension PlantSchemaV3.Photo: Equatable {
-    static func ==(lhs: PlantSchemaV3.Photo, rhs: PlantSchemaV3.Photo) -> Bool {
-        return lhs.id == rhs.id && lhs.id == rhs.id
-    }
-}
-
-extension PlantSchemaV2 {
-    @Model
-    class Photo: Identifiable, Hashable{
-        var id: UUID
-        var url: URL
-        var plant: Plant?
-        var notes: [Note]?
         
-        init(id: UUID = UUID(), url: URL) {
-            self.id = id
-            self.url = url
-        }
-    }
-    
-    
-}
-
-extension PlantSchemaV2.Photo: Equatable {
-    static func ==(lhs: PlantSchemaV2.Photo, rhs: PlantSchemaV2.Photo) -> Bool {
-        return lhs.id == rhs.id && lhs.id == rhs.id
     }
 }
-
-
-
-//OLD SCHEMA DATA
-extension PlantSchemaV1 {
-    @Model
-    class Photo: Identifiable, Hashable{
-        var id: UUID
-        var url: URL
-        var plant: Plant?
-        
-        init(id: UUID = UUID(), url: URL) {
-            self.id = id
-            self.url = url
-        }
-    }
-    
-    
-}
-
-extension PlantSchemaV1.Photo: Equatable {
-    static func ==(lhs: PlantSchemaV1.Photo, rhs: PlantSchemaV1.Photo) -> Bool {
-        return lhs.id == rhs.id && lhs.id == rhs.id
-    }
-}
-
-
-
-

@@ -19,133 +19,89 @@ struct PhotoPicker: UIViewControllerRepresentable {
     var updatingProfile: Bool
     @Binding var profilePic: Photo
     @Binding var addingNote: Note?
-   // @EnvironmentObject var dataModel: DataModel
-   
     
     init(
-            plant: Binding<Plant>,
-            updatingProfile: Bool,
-            profilePic: Binding<Photo>,
-            addingNote: Binding<Note?> = .constant(nil) // Default value here
-        ) {
-            self._plant = plant
-            self.updatingProfile = updatingProfile
-            self._profilePic = profilePic
-            self._addingNote = addingNote
-        }
-    /// A dismiss action provided by the environment. This may be called to dismiss this view controller.
+        plant: Binding<Plant>,
+        updatingProfile: Bool,
+        profilePic: Binding<Photo>,
+        addingNote: Binding<Note?> = .constant(nil)
+    ) {
+        self._plant = plant
+        self.updatingProfile = updatingProfile
+        self._profilePic = profilePic
+        self._addingNote = addingNote
+    }
+    
     @Environment(\.dismiss) var dismiss
     
-    /// Creates the picker view controller that this object represents.
-    func makeUIViewController(context: UIViewControllerRepresentableContext<PhotoPicker>) -> PHPickerViewController {
-        
-        // Configure the picker.
-        var configuration = PHPickerConfiguration(photoLibrary: PHPhotoLibrary.shared())
-        // Limit to images.
+    func makeUIViewController(context: Context) -> PHPickerViewController {
+        var configuration = PHPickerConfiguration()
         configuration.filter = .images
-        // Avoid transcoding, if possible.
-        configuration.preferredAssetRepresentationMode = .current
-
         let photoPickerViewController = PHPickerViewController(configuration: configuration)
         photoPickerViewController.delegate = context.coordinator
         return photoPickerViewController
     }
     
-    /// Creates the coordinator that allows the picker to communicate back to this object.
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
+    
+    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    
 
-    /// Updates the picker while it’s being presented.
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: UIViewControllerRepresentableContext<PhotoPicker>) {
-        // No updates are necessary.
-    }
-}
-
-class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
-    var parent: PhotoPicker
-    
-    init(_ parent: PhotoPicker) {
-        self.parent = parent
-    }
-    
-    
-    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        self.parent.dismiss()
+    class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
+        var parent: PhotoPicker
         
+        init(_ parent: PhotoPicker) {
+            self.parent = parent
+        }
         
-        guard let result = results.first,
-              let assetIdentifier = result.assetIdentifier else { return }
-        
-    
-        let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [assetIdentifier], options: nil)
-        guard let existingAsset = fetchResult.firstObject else { return }
-        
-        self.getOrCreateAlbum(title: "Plant Mama") { album in
-            guard let album = album else { return }
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            parent.dismiss()
             
-            PHPhotoLibrary.shared().performChanges({
-                if let albumRequest = PHAssetCollectionChangeRequest(for: album) {
-                    albumRequest.addAssets([existingAsset] as NSArray)
+            // Ensure the user actually picked an image
+            guard let provider = results.first?.itemProvider, provider.canLoadObject(ofClass: UIImage.self) else { return }
+            
+            // Load the picked object asynchronously into memory as a UIImage
+            provider.loadObject(ofClass: UIImage.self) { [weak self] object, error in
+                guard let self = self, let uiImage = object as? UIImage else { return }
+                
+                // Save the image data directly to the public "Plant Mama" Files app folder
+                guard let allocatedFileName = FilesAppStorageManager.saveToFilesApp(image: uiImage) else {
+                    print("Error: Failed to write picker image to Files app sandbox disk.")
+                    return
                 }
-            }) { success, error in
-                if success {
-                    Task { @MainActor in
-                        withAnimation {
-                            let newPhoto = Photo(identifier: assetIdentifier)
-                            self.parent.plant.photos.append(newPhoto)
-                            
-                            if self.parent.updatingProfile {
-                                newPhoto.plant = self.parent.plant
-                                self.parent.plant.profilePic = newPhoto
-                                self.parent.profilePic = newPhoto
-                            }
-                            
-                            if let currentNote = self.parent.addingNote {
-                                if currentNote.photos == nil {
-                                    currentNote.photos = [newPhoto]
-                                } else {
-                                    currentNote.photos?.append(newPhoto)
-                                }
+                
+                //Update SwiftData properties and UI lists on the Main Actor
+                Task { @MainActor in
+                    withAnimation {
+                        // Instantiate the new Photo model using the allocated local file name string
+                        let newPhoto = Photo(identifier: allocatedFileName)
+                        
+                        // Append to the specific plant's photostream
+                        self.parent.plant.photos.append(newPhoto)
+                        
+                        // Handle user profile picture updates
+                        if self.parent.updatingProfile {
+                            newPhoto.plant = self.parent.plant
+                            self.parent.plant.profilePic = newPhoto
+                            self.parent.profilePic = newPhoto
+                        }
+                        
+                        // Link photo reference to an open note item if present
+                        if let currentNote = self.parent.addingNote {
+                            if currentNote.photos == nil {
+                                currentNote.photos = [newPhoto]
+                            } else {
+                                currentNote.photos.append(newPhoto)
                             }
                         }
                     }
-                } else {
-                    print("Failed to add existing asset to folder: \(error?.localizedDescription ?? "Unknown error")")
                 }
             }
         }
     }
-
-
-    
-    // Helper: Finds or creates the custom album
-    private func getOrCreateAlbum(title: String, completion: @escaping (PHAssetCollection?) -> Void) {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "title = %@", title)
-        let collections = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .any, options: fetchOptions)
-        
-        if let album = collections.firstObject {
-            completion(album)
-        } else {
-            var albumPlaceholder: PHObjectPlaceholder?
-            PHPhotoLibrary.shared().performChanges({
-                let request = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: title)
-                albumPlaceholder = request.placeholderForCreatedAssetCollection
-            }) { success, _ in
-                if success, let placeholder = albumPlaceholder {
-                    let fetchResult = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [placeholder.localIdentifier], options: nil)
-                    completion(fetchResult.firstObject)
-                } else {
-                    completion(nil)
-                }
-            }
-        }
-    }
-
-
-
-    
-    
 }
+
+            
 

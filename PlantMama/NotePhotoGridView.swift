@@ -15,7 +15,7 @@ struct NotePhotoGridView: View {
         LazyVGrid(columns: columns) {
                 ForEach (photos){ photo in
                     
-                    let isSelected = note.photos?.contains(where: { $0.id == photo.id }) ?? false
+                    let isSelected = note.photos.contains(where: { $0.id == photo.id }) ?? false
                     
                     GeometryReader{
                         geo in
@@ -40,12 +40,19 @@ struct NotePhotoGridView: View {
     
     private func togglePhotoSelection(_ photo: Photo, isSelected: Bool){
         if isSelected{
-            note.photos?.removeAll(where: { $0.id == photo.id})
+            note.photos.removeAll(where: { $0.id == photo.id})
+            photo.notes.removeAll(where: {$0.id == note.id})
         } else {
             if note.photos == nil {
                 note.photos = [photo]
+            } else{
+                note.photos.append(photo)
             }
-            note.photos?.append(photo)
+            if photo.notes == nil {
+                photo.notes = [note]
+            } else {
+                photo.notes.append(note)
+            }
         }
     }
     

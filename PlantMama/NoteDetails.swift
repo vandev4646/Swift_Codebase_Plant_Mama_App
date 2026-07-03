@@ -21,14 +21,14 @@ struct NoteDetails: View {
                 
             }.padding()
 
-            if let photoList = note.photos, photoList.isEmpty{
+            if note.photos.isEmpty{
                 ContentUnavailableView("No photos", systemImage: "camera", description: Text("Click edit to add photos to this note."))
             }
             else{
                 ScrollView{
                     LazyVGrid(columns: columns) {
-                        if let photos = note.photos {
-                            ForEach (photos){
+                        
+                            ForEach (note.photos){
                                 photo in GeometryReader{
                                     geo in
                                     PhotoCardView(size: geo.size.width, photo: photo)
@@ -36,7 +36,7 @@ struct NoteDetails: View {
                                 .cornerRadius(8.0)
                                 .aspectRatio(1, contentMode: .fit)
                             }
-                        }
+                        
                     }.padding()
                 }
             }

@@ -29,14 +29,13 @@ struct DetailEditView: View {
             plantToEdit = plant
             isCreatingPlant = false
         } else {
-            plantToEdit = Plant(name: "", profilePic: Photo(identifier: "Default"), type: "", details: "", reminders: [], photos: [],
-                noteList: [])
+            plantToEdit = Plant(name: "", profilePic: Photo(identifier: "Default"), type: "", details: "")
             isCreatingPlant = true
         }
         
         self.plant = plantToEdit
         self.name = plantToEdit.name
-        self.datePurchased = plantToEdit.datePurChased
+        self.datePurchased = plantToEdit.datePurchased
         self.type = plantToEdit.type
         self.details = plantToEdit.details
         self.size = size
@@ -104,7 +103,7 @@ struct DetailEditView: View {
         plant.name = name
         plant.details = details
         plant.type = type
-        plant.datePurChased = datePurchased
+        plant.datePurchased = datePurchased
         plant.profilePic = profilePic
 
         if isCreatingPlant {

@@ -13,9 +13,18 @@ struct PhotoCardView: View {
     
     var body: some View {
        // ZStack(alignment: .topTrailing) {
-        LibraryImage(identifier: photo.identifier, size: CGSize(width: size, height: size))
-                    .frame(width: size, height: size)
-                    .clipped() // Ensures image doesn't bleed outside the frame
+        if let uiImage = photo.image {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: size, height: size)
+                .clipped()
+        } else {
+            ContentUnavailableView("No Image", systemImage: "photo.badge.plus"
+                                   , description: Text("Image not found. Remove this placeholder and add a new image."))
+                .frame(width: size, height: size)
+                .background(Color(.systemGray6))
+        }
     }
 }
 

@@ -19,12 +19,21 @@ struct SetProfilePic: View {
         
         ZStack(alignment: .bottom) {
             if !isEditing {
-                LibraryImage(identifier: profilePic.identifier, size: CGSize(width: size, height: size))
-                        //.resizable()
+                if let uiImage = profilePic.image {
+                    Image(uiImage: uiImage)
+                        .resizable()
                         .scaledToFill()
-                        .frame(minWidth: size, maxWidth: size , minHeight: size, maxHeight: size)
+                        .frame(width: size, height: size)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
-                
+                } else {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(.systemGray5))
+                        .frame(width: size, height: size)
+                        .overlay {
+                            Image(systemName: "photo")
+                                .foregroundColor(.gray)
+                        }
+                }
                 
             }
             

@@ -1,57 +1,49 @@
-//
-//  PlantMamaApp.swift
-//  PlantMama
-//
-//  Created by Vanessa Bennett on 5/3/25.
-//
-
 import SwiftUI
 import SwiftData
 
-typealias Plant = PlantSchemaV4.Plant
-typealias Photo = PlantSchemaV4.Photo
-typealias Note = PlantSchemaV4.Note
-typealias Reminder = PlantSchemaV4.Reminder
+// Keeping your typealiases intact to start fresh on Schema 1
+typealias Plant = PlantSchemaV1.Plant
+typealias Photo = PlantSchemaV1.Photo
+typealias Note = PlantSchemaV1.Note
+typealias Reminder = PlantSchemaV1.Reminder
 
 @main
 struct PlantMamaApp: App {
-    //@StateObject private var plantData = PlantData()
     let container: ModelContainer
     
     init() {
-    
-        //UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: Color(.dotBrown)]
-        //UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: Color(.dotBrown)]
-
+        // 1. Manually force-create the missing directory to bypass the iOS simulator bug
+        let fileManager = FileManager.default
+        if let libraryDirectory = fileManager.urls(for: .libraryDirectory, in: .userDomainMask).first {
+            let appSupportURL = libraryDirectory.appendingPathComponent("Application Support", isDirectory: true)
+            
+            if !fileManager.fileExists(atPath: appSupportURL.path) {
+                try? fileManager.createDirectory(at: appSupportURL, withIntermediateDirectories: true, attributes: nil)
+                print("Successfully pre-created Application Support directory to bypass sandbox error.")
+            }
+        }
+        
+        // 2. Initialize the container safely inside the lifecycle step
         do {
-            // 1. Define the current schema explicitly
             let schema = Schema([
-                PlantSchemaV4.Plant.self,
-                PlantSchemaV4.Photo.self,
-                PlantSchemaV4.Note.self,
-                PlantSchemaV4.Reminder.self
+                Plant.self,
+                Photo.self,
+                Reminder.self,
+                Note.self
             ])
-            
-            // 2. Configure the storage
-            let config = ModelConfiguration(schema: schema)
-            
-            // 3. Initialize with the explicit schema and migration plan
-            container = try ModelContainer(
-                for: schema,
-                migrationPlan: AppMigrationPlan.self,
-                configurations: [config]
-            )
+            let configuration = ModelConfiguration(schema: schema)
+            container = try ModelContainer(for: schema, configurations: [configuration])
         } catch {
-            fatalError("Failed to initialize Model Container: \(error)")
+            fatalError("Could not initialize fresh SwiftData container: \(error.localizedDescription)")
         }
     }
-
+    
     var body: some Scene {
         WindowGroup {
             NavigationView {
                 ContentView()
             }
-            .modelContainer(container)
+            .modelContainer(container) // Injects your container down to the views
         }
     }
 }

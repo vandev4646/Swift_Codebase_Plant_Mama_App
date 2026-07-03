@@ -20,7 +20,7 @@ enum Frequency: String, Codable, CaseIterable, Identifiable {
 
 struct AddReminder: View {
     let plant: Plant
-    @State private var reminder = Reminder(title: "", detail: "", date: Date(), frequency: .once)
+    @State private var reminder = Reminder(title: "", date: Date(), frequency: .once)
     @Binding var addingReminder: Bool
     @State var permissionDenied = false
     

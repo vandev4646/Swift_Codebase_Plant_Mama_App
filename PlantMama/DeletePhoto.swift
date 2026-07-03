@@ -16,9 +16,10 @@ enum PhotoDeleteType {
 func deletePhoto(photo: Photo, type: PhotoDeleteType, context: ModelContext) -> Int {
     if (photo.plant?.profilePic.id == photo.id){ return -1}
     if type == .all {
+        FilesAppStorageManager.deletePhotoFromFolder(photo: photo)
         photo.plant?.photos.removeAll(where: { $0.id == photo.id })
-        photo.notes?.forEach { note in
-            note.photos?.removeAll(where: { $0.id == photo.id })
+        photo.notes.forEach { note in
+            note.photos.removeAll(where: { $0.id == photo.id })
         }
         
         context.delete(photo)

@@ -8,17 +8,29 @@
 import SwiftUI
 import SwiftData
 
-extension PlantSchemaV4{
+//WARNING: DO NOT UPDATE THIS FILE
+
+extension PlantSchemaV1 {
     @Model
-    class Reminder: Identifiable, Hashable {
-        var id: UUID
+    class Reminder {
+        @Attribute(.unique) var id: UUID
         var title: String
         var date: Date
-        var plant: Plant?
+        
+        var plant: PlantSchemaV1.Plant?
+        
         var frequency: Frequency
         var monthlyInterval: Int
+        var lastUpdated: Date = Date()
+        var syncState: SyncState = SyncState.NOT_SYNCED
         
-        init(id: UUID = UUID(), title: String, detail: String, date: Date, frequency: Frequency, monthlyInterval: Int = 1) {
+        init(
+            id: UUID = UUID(),
+            title: String,
+            date: Date,
+            frequency: Frequency,
+            monthlyInterval: Int = 1
+        ) {
             self.id = id
             self.title = title
             self.date = date
@@ -27,56 +39,4 @@ extension PlantSchemaV4{
         }
     }
 }
-
-extension PlantSchemaV3{
-    @Model
-    class Reminder: Identifiable, Hashable {
-        var id: UUID
-        var title: String
-        var date: Date
-        var plant: Plant?
-        
-        init(id: UUID = UUID(), title: String, detail: String, date: Date) {
-            self.id = id
-            self.title = title
-            self.date = date
-        }
-    }
-}
-
-extension PlantSchemaV2{
-    @Model
-    class Reminder: Identifiable, Hashable {
-        var id: UUID
-        var title: String
-        var date: Date
-        var plant: PlantSchemaV2.Plant?
-        
-        init(id: UUID = UUID(), title: String, detail: String, date: Date) {
-            self.id = id
-            self.title = title
-            self.date = date
-        }
-    }
-}
-
-extension PlantSchemaV1{
-    @Model
-    class Reminder: Identifiable, Hashable {
-        var id: UUID
-        var title: String
-        //var detail: String
-        var date: Date
-        var plant: PlantSchemaV1.Plant?
-        
-        init(id: UUID = UUID(), title: String, detail: String, date: Date) {
-            self.id = id
-            self.title = title
-           // self.detail = detail
-            self.date = date
-        }
-    }
-}
-
-
 

@@ -19,7 +19,14 @@ struct PhotoDetail: View {
     
     var body: some View {
         Group {
-            LibraryImage(identifier: photo.identifier)
+            if let uiImage = photo.image {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+            } else {
+                ContentUnavailableView("Image was not found. Remove this place holder and add a new image.", systemImage: "photo.badge.plus")
+                    .background(Color(.systemGray6))
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ignoresSafeArea()
@@ -63,8 +70,8 @@ struct PhotoDetail: View {
     private var noteSheet: some View {
         NavigationStack{
             List{
-                if let notes = photo.notes, !notes.isEmpty {
-                    ForEach(notes) { note in
+                if !photo.notes.isEmpty {
+                    ForEach(photo.notes) { note in
                         VStack(alignment: .leading,){
                             Text(note.title)
                                 .font(.headline)

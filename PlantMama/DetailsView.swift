@@ -20,7 +20,7 @@ struct DetailsView: View {
                 VStack{
                         DetailsRow(label: "Name", value: plant.name)
                             .padding(5)
-                        DetailsRow(label: "Age", value: ageFormatted(datePurchased: plant.datePurChased))
+                        DetailsRow(label: "Age", value: ageFormatted(datePurchased: plant.datePurchased))
                             .padding(5)
                         DetailsRow(label: "Type", value: plant.type)
                             .padding(5)

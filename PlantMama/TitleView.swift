@@ -24,9 +24,20 @@ struct TitleView: View {
                         .padding(.trailing, 10)
 
                     
-                    LibraryImage(identifier: plant.profilePic.identifier)
-                        .frame(minWidth: 60, maxWidth: 60 , minHeight: 60, maxHeight: 60)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    if let uiImage = plant.profilePic.image {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 60, height: 60)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    } else {
+                        Image("Default")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 60, height: 60)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    
                     Spacer()
                 }.modifier(EntryBannerStyle())
             
