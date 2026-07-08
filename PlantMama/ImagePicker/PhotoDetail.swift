@@ -16,6 +16,7 @@ struct PhotoDetail: View {
     @Environment(\.modelContext) private var context
     @State private var showingDeleteConfirmation = false
     @State private var showingDeleteError = false
+    @EnvironmentObject private var syncManager: FirestoreSyncManager
     
     var body: some View {
         Group {
@@ -43,6 +44,7 @@ struct PhotoDetail: View {
         .confirmationDialog("Are you sure?", isPresented: $showingDeleteConfirmation, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
                 Task {
+                    syncManager.deleteBackupPhoto(photo: photo, context: context)
                     let result = deletePhoto(photo: photo, type: type, context: context)
                     if result == -1 {
                                 showingDeleteError = true

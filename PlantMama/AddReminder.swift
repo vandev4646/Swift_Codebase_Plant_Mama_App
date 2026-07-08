@@ -28,6 +28,8 @@ struct AddReminder: View {
     @State private var monthInterval: Int = 1
     
     let notificationCenter = UNUserNotificationCenter.current()
+    @EnvironmentObject private var syncManager: FirestoreSyncManager
+    @Environment(\.modelContext) private var context
     
     
     var body: some View {
@@ -55,6 +57,7 @@ struct AddReminder: View {
                 plant.reminders.append(reminder)
                 scheduleNotification(title: plant.name + "'s" + " reminder", body: reminder.title, date: reminder.date, identifier: reminder.id.uuidString,
                                      frequency: selectedFrequency, interval: monthInterval)
+                syncManager.backupReminder(reminder: reminder, context: context)
                 addingReminder.toggle()
             }, label: {Label("Add Reminder", systemImage: "plus")}).disabled(permissionDenied || reminder.title.isEmpty)
            

@@ -14,6 +14,7 @@ struct AddNote: View {
     @State var note = Note(title: "", date: Date())
     @State var isAddingPhoto: Bool = false
     @State private var gridColumns = Array(repeating: GridItem(.flexible()), count: 2)
+    @EnvironmentObject private var syncManager: FirestoreSyncManager
     // Creates a temporary Binding<Note?> from Binding<Note>
     var optionalNoteBinding: Binding<Note?> {
         Binding<Note?>(
@@ -68,14 +69,6 @@ struct AddNote: View {
                     
                 }.padding()
                 HStack{
-                    /*
-                    Button(action: {
-                        isAddingPhoto = true
-                    }, label: {Label("Add Photo", systemImage: "photo.badge.plus.fill")})
-                    .disabled(title.isEmpty)
-                    .buttonStyle(.borderless)
-                    .opacity(title.isEmpty ? 0.5: 1.0)
-                     */
                     Spacer()
                     Button(action: {
                         do {
@@ -84,8 +77,6 @@ struct AddNote: View {
                         } catch {
                             errorWrapper = ErrorWrapper(error: error, guidance: "New Note was not created. Try again later.")
                         }
-                        //plant.noteList.append(note)
-                        //addingNote.toggle()
                     }, label: {Label("Save!", systemImage: "plus.circle.fill")})
                     .disabled(title.isEmpty)
                     .buttonStyle(.borderless)
@@ -126,8 +117,9 @@ struct AddNote: View {
         }
         .confirmationDialog("Are you sure you want to delete this note?", isPresented: $deleteNote, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
+                syncManager.deleteBackupNote(note: note, context: context)
                 plant.noteList.removeAll(where: { $0.id == note.id })
-                    context.delete(note)
+                context.delete(note)
                 dismiss()
                                 
             }
@@ -151,6 +143,7 @@ struct AddNote: View {
         
         try context.save()
         plant.noteList.append(note)
+        syncManager.backupNote(note: note, context: context)
     }
     
     func formattedDate(date: Date) -> String

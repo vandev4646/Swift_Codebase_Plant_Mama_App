@@ -19,6 +19,7 @@ struct DetailEditView: View {
     @State private var errorWrapper: ErrorWrapper?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @EnvironmentObject private var syncManager: FirestoreSyncManager
     
     let isCreatingPlant: Bool
     let size: Double
@@ -112,6 +113,8 @@ struct DetailEditView: View {
         }
 
         try context.save()
+        syncManager.backupPlant(plant: plant, context: context)
+        
     }
     
 }

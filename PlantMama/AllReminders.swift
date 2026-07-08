@@ -61,6 +61,7 @@ struct AllReminders: View {
     struct AllRemindersDetails: View {
         @State var reminder: Reminder
         @Environment(\.modelContext) private var context
+        @EnvironmentObject private var syncManager: FirestoreSyncManager
         var body: some View {
             VStack{
                 HStack {
@@ -103,7 +104,11 @@ struct AllReminders: View {
             }.padding()
                 .onAppear{
                     if let plant = reminder.plant {
-                        cleanupExpiredReminders(plant: plant, context: context)
+                        cleanupExpiredReminders(
+                            plant: plant,
+                            context: context,
+                            syncManager: syncManager
+                        )
                     }
                 }
         }

@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseCore
 import SwiftData
 
 // Keeping your typealiases intact to start fresh on Schema 1
@@ -11,6 +12,9 @@ typealias Reminder = PlantSchemaV1.Reminder
 struct PlantMamaApp: App {
     let container: ModelContainer
     
+    @StateObject private var syncManager: FirestoreSyncManager
+    @StateObject private var authManager = AuthManager()
+    
     init() {
         // 1. Manually force-create the missing directory to bypass the iOS simulator bug
         let fileManager = FileManager.default
@@ -21,6 +25,7 @@ struct PlantMamaApp: App {
                 try? fileManager.createDirectory(at: appSupportURL, withIntermediateDirectories: true, attributes: nil)
                 print("Successfully pre-created Application Support directory to bypass sandbox error.")
             }
+            FirebaseApp.configure()
         }
         
         // 2. Initialize the container safely inside the lifecycle step
@@ -32,7 +37,12 @@ struct PlantMamaApp: App {
                 Note.self
             ])
             let configuration = ModelConfiguration(schema: schema)
-            container = try ModelContainer(for: schema, configurations: [configuration])
+            let initializedContainer = try ModelContainer(for: schema, configurations: [configuration])
+            self.container = initializedContainer
+            
+            let context = initializedContainer.mainContext
+            self._syncManager = StateObject(wrappedValue: FirestoreSyncManager(context: context))
+            
         } catch {
             fatalError("Could not initialize fresh SwiftData container: \(error.localizedDescription)")
         }
@@ -40,10 +50,22 @@ struct PlantMamaApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationView {
-                ContentView()
+            Group {
+                if !authManager.isInitialCheckComplete {
+                    ProgressView()
+                } else if authManager.currentUser != nil {
+                    // User is authenticated successfully
+                    NavigationView {
+                        ContentView()
+                    }
+                } else {
+                    // No authenticated session found
+                    AuthenticationView()
+                        .environmentObject(authManager)
+                }
             }
-            .modelContainer(container) // Injects your container down to the views
+            .modelContainer(container)
+            .environmentObject(syncManager) 
         }
     }
 }

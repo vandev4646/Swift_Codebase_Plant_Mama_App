@@ -18,6 +18,8 @@ struct ContentView: View {
     @State var presentSideMenu = false
     @State var selectedSideMenuTab = 0
     @State private var showInfo = false
+    @StateObject private var authManager = AuthManager()
+    @EnvironmentObject private var syncManager: FirestoreSyncManager
     
     var body: some View {
        // GeometryReader {
@@ -106,10 +108,18 @@ struct ContentView: View {
                                 )
                                 .padding(40) // Space from screen edges
                                 .transition(.scale.combined(with: .opacity))
-                            }
-                        //}
-                        //.animation(.spring(), value: selectedSideMenuTab)
-                    SideMenu(isShowing: $presentSideMenu, content: AnyView(SideMenuView(selectedSideMenuTab: $selectedSideMenuTab, presentSideMenu: $presentSideMenu)))
+                        }
+                        
+                    SideMenu(
+                        isShowing: $presentSideMenu,
+                        content: AnyView(
+                            SideMenuView(
+                                selectedSideMenuTab: $selectedSideMenuTab,
+                                presentSideMenu: $presentSideMenu
+                            )
+                            .environmentObject(authManager)
+                        )
+                    )
                 }
                 
                 .toolbar {ToolbarItem {
@@ -127,6 +137,7 @@ struct ContentView: View {
         
                 .sheet(isPresented: $isAddingNewPlant) {
                     NewPlantSheet()
+                        .environmentObject(syncManager)
                 }
                 .background(
                         Image("MenuBackground")

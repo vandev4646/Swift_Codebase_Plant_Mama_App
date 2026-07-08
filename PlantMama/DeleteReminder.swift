@@ -16,7 +16,11 @@ func cancelNotification (identifier: String){
 
 
 
-func cleanupExpiredReminders(plant: Plant, context: ModelContext) {
+@MainActor func cleanupExpiredReminders(
+    plant: Plant,
+    context: ModelContext,
+    syncManager: FirestoreSyncManager
+) {
     let now = Date()
     let expiredReminders = plant.reminders.filter{ reminder in
         let isOnce = reminder.frequency == .once
@@ -25,6 +29,7 @@ func cleanupExpiredReminders(plant: Plant, context: ModelContext) {
     }
     
     for reminder in expiredReminders {
+        syncManager.deleteBackupReminder(reminder: reminder, context: context)
         //remove from plant
         plant.reminders.removeAll(where: { $0.id == reminder.id})
         //delete from sift data

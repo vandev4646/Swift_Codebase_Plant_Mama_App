@@ -19,6 +19,7 @@ struct PhotoPicker: UIViewControllerRepresentable {
     var updatingProfile: Bool
     @Binding var profilePic: Photo
     @Binding var addingNote: Note?
+    @EnvironmentObject var syncManager: FirestoreSyncManager
     
     init(
         plant: Binding<Plant>,
@@ -43,7 +44,7 @@ struct PhotoPicker: UIViewControllerRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+        Coordinator(self, syncManager: syncManager)
     }
     
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
@@ -51,12 +52,15 @@ struct PhotoPicker: UIViewControllerRepresentable {
 
     class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
         var parent: PhotoPicker
+        let syncManager: FirestoreSyncManager
         
-        init(_ parent: PhotoPicker) {
+        init(_ parent: PhotoPicker, syncManager: FirestoreSyncManager) {
             self.parent = parent
+            self.syncManager = syncManager
         }
         
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            @Environment(\.modelContext) var context
             parent.dismiss()
             
             // Ensure the user actually picked an image
@@ -80,6 +84,7 @@ struct PhotoPicker: UIViewControllerRepresentable {
                         
                         // Append to the specific plant's photostream
                         self.parent.plant.photos.append(newPhoto)
+                        self.syncManager.backupPhoto(photo: newPhoto, context: context)
                         
                         // Handle user profile picture updates
                         if self.parent.updatingProfile {

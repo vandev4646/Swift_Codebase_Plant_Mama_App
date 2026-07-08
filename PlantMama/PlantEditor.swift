@@ -16,6 +16,7 @@ struct PlantEditor: View {
     //@EnvironmentObject var plantData: PlantData
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
+    @EnvironmentObject private var syncManager: FirestoreSyncManager
     
     @State private var plantCopy: Plant?
     @State private var isEditing = false
@@ -57,7 +58,10 @@ struct PlantEditor: View {
         .confirmationDialog("Are you sure?", isPresented: $isDeleted, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
                 Task {
-                    
+                    //delete from firstore
+                    syncManager
+                        .deleteBackupPlant(plant: plant, context: context)
+                    //delete from context
                     context.delete(plant)
                     dismiss()
                     

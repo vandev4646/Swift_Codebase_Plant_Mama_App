@@ -14,6 +14,7 @@ enum SideMenuRowType: Int, CaseIterable {
     case allPhotos
     case addPlant
     case info
+    case signOut
     
     
     
@@ -29,6 +30,8 @@ enum SideMenuRowType: Int, CaseIterable {
             return "All Photos"
         case .info:
             return "Info"
+        case .signOut:
+            return "Sign Out"
         }
     }
     
@@ -44,6 +47,8 @@ enum SideMenuRowType: Int, CaseIterable {
             return "photo.on.rectangle.angled.fill"
         case .info:
             return "info.square"
+        case .signOut:
+            return "lock.open.fill"
         }
     }
     
@@ -57,6 +62,8 @@ struct SideMenuView: View {
     @Binding var selectedSideMenuTab: Int
     @Binding var presentSideMenu: Bool
     
+    @EnvironmentObject var authManager: AuthManager
+    
     var body: some View {
         HStack {
             
@@ -69,8 +76,13 @@ struct SideMenuView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(SideMenuRowType.allCases, id: \.self){ row in
                         RowView(isSelected: selectedSideMenuTab == row.rawValue, imageName: row.iconName, title: row.title) {
-                            selectedSideMenuTab = row.rawValue
-                            presentSideMenu.toggle()
+                            if row == .signOut{
+                                authManager.signOut()
+                                presentSideMenu == false
+                            } else{
+                                selectedSideMenuTab = row.rawValue
+                                presentSideMenu.toggle()
+                            }
                         }
                     }
                     
